@@ -1,7 +1,44 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "title": "kinosaya API",
+        "contact": {},
+        "version": "1.0"
     },
-    "paths": {}
+    "host": "localhost:80",
+    "basePath": "/",
+    "paths": {
+        "/": {
+            "get": {
+                "description": "Returns a JSON response with success status.",
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "hit the broker",
+                "operationId": "get-sample-response",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/main.jsonResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "main.jsonResponse": {
+            "type": "object",
+            "properties": {
+                "data": {},
+                "error": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
 }

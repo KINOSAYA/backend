@@ -1,4 +1,29 @@
+basePath: /
+definitions:
+  main.jsonResponse:
+    properties:
+      data: {}
+      error:
+        type: boolean
+      message:
+        type: string
+    type: object
+host: localhost:80
 info:
   contact: {}
-paths: {}
+  title: kinosaya API
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: Returns a JSON response with success status.
+      operationId: get-sample-response
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/main.jsonResponse'
+      summary: hit the broker
 swagger: "2.0"

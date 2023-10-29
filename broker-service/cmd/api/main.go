@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "broker-service/cmd/api/docs"
 	"fmt"
 	"log"
 	"net/http"
@@ -10,6 +11,12 @@ const webPort = "80"
 
 type Config struct {
 }
+
+// @title kinosaya API
+// @version 1.0
+
+// @host localhost:80
+// @BasePath /
 
 func main() {
 	// TODO: try to connect to rabbitmq

@@ -1,3 +1,4 @@
 .idea
 /broker-service/brokerApp
 /db-data
+/authentication-service/authApp

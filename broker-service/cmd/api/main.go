@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-const webPort = "80"
+const webPort = "8080"
 
 type Config struct {
 }
@@ -15,7 +15,7 @@ type Config struct {
 // @title kinosaya API
 // @version 1.0
 
-// @host localhost:80
+// @host localhost:8080
 // @BasePath /
 
 func main() {

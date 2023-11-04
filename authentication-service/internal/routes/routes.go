@@ -1,4 +1,4 @@
-package main
+package routes
 
 import (
 	"github.com/go-chi/chi/v5"
@@ -7,7 +7,7 @@ import (
 	"net/http"
 )
 
-func (app *Config) getRoutes() http.Handler {
+func GetRoutes() http.Handler {
 	mux := chi.NewRouter()
 
 	// specify who is allowed to connect

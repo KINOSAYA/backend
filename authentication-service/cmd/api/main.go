@@ -1,6 +1,7 @@
 package main
 
 import (
+	"authentication-service/data"
 	"database/sql"
 	"fmt"
 	"log"
@@ -26,6 +27,7 @@ func main() {
 	app := Config{
 		DB: db,
 	}
+	data.MigrateUp()
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", authPort),

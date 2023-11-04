@@ -7,7 +7,7 @@ import (
 type DatabaseRepo interface {
 	GetUserByID(id int) (models.User, error)
 
-	AddUser(user models.User) error
+	AddUser(user models.User) (int, error)
 
 	UpdateUser(user models.User) error
 

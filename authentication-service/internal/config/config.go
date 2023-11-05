@@ -1,9 +1,9 @@
 package config
 
 import (
-	"database/sql"
+	"authentication-service/internal/repository"
 )
 
 type Config struct {
-	DB *sql.DB
+	DB repository.DatabaseRepo
 }

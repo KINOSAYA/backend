@@ -20,9 +20,11 @@ import (
 
 var authPort = os.Getenv("port")
 
+var app config.Config
+
 func main() {
 	db := driver.ConnectToDB()
-	app := config.Config{
+	app = config.Config{
 		DB: db,
 	}
 	data.MigrateUp()

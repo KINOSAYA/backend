@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "/internal/auth";
+
+message User {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+}
+
+message UserRequest {
+  User userEntry = 1;
+}
+
+message UserResponse {
+  string result = 1;
+}
+
+service AuthService {
+  rpc RegisterUser(UserRequest) returns (UserResponse);
+}

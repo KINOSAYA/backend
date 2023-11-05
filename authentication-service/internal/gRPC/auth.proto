@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package auth;
+
+option go_package = "/internal/gRPC";
+
+message User {
+  string username = 1;
+  string email = 2;
+  string password = 3;
+}
+
+service AuthService {
+  rpc RegisterUser(User) returns (User);
+}

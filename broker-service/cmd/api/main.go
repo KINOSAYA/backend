@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 const webPort = "8080"
+
+var authGrpcPort = os.Getenv("authGrpcPort")
 
 type Config struct {
 }

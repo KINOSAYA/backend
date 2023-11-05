@@ -11,6 +11,8 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+    environment:
+      authGrpcPort: "50001"
 
   authentication-service:
     build:

@@ -1,6 +1,7 @@
-package main
+package routers
 
 import (
+	"broker-service/internal/handlers"
 	"fmt"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -9,7 +10,23 @@ import (
 	"net/http"
 )
 
-func (app *Config) routes() http.Handler {
+type Router interface {
+	GetRoutes() http.Handler
+}
+
+type ChiRouters struct {
+	Handler handlers.Handler
+	WebPort string
+}
+
+func NewChiRouters(newHandler handlers.Handler, webPort string) *ChiRouters {
+	return &ChiRouters{
+		Handler: newHandler,
+		WebPort: webPort,
+	}
+}
+
+func (chiRouter *ChiRouters) GetRoutes() http.Handler {
 	mux := chi.NewRouter()
 
 	// specify who is allowed to connect
@@ -24,13 +41,13 @@ func (app *Config) routes() http.Handler {
 
 	mux.Use(middleware.Heartbeat("/ping"))
 
-	mux.Get("/", app.broker)
+	mux.Get("/", chiRouter.Handler.Broker)
 	mux.Get("/swagger/*", httpSwagger.Handler(
-		httpSwagger.URL(fmt.Sprintf("http://localhost:%s/swagger/doc.json", webPort)), //The url pointing to API definition
+		httpSwagger.URL(fmt.Sprintf("http://localhost:%s/swagger/doc.json", chiRouter.WebPort)), //The url pointing to API definition
 	))
 
 	mux.Route("/auth", func(mux chi.Router) {
-		mux.Post("/registration", app.RegisterUser)
+		mux.Post("/registration", chiRouter.Handler.RegisterUser)
 	})
 
 	return mux

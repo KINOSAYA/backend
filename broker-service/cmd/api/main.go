@@ -2,6 +2,9 @@ package main
 
 import (
 	_ "broker-service/cmd/api/docs"
+	"broker-service/internal/config"
+	"broker-service/internal/handlers"
+	"broker-service/internal/routers"
 	"fmt"
 	"log"
 	"net/http"
@@ -12,9 +15,6 @@ const webPort = "8080"
 
 var authGrpcPort = os.Getenv("authGrpcPort")
 
-type Config struct {
-}
-
 // @title kinosaya API
 // @version 1.0
 
@@ -24,14 +24,17 @@ type Config struct {
 func main() {
 	// TODO: try to connect to rabbitmq
 
-	app := Config{}
+	// Dependency Injection
+	broker := handlers.NewBrokerHandler(authGrpcPort)
+	chiRouter := routers.NewChiRouters(broker, webPort)
+	app := config.NewConfig(chiRouter)
 
 	log.Printf("Starting broker service on port %s\n", webPort)
 
 	// define http server
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", webPort),
-		Handler: app.routes(),
+		Handler: app.Router.GetRoutes(),
 	}
 
 	err := srv.ListenAndServe()

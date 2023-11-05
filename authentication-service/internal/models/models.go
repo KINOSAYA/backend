@@ -2,6 +2,16 @@ package models
 
 import "time"
 
+func New() Models {
+	return Models{
+		UserEntry: User{},
+	}
+}
+
+type Models struct {
+	UserEntry User
+}
+
 type User struct {
 	ID        int
 	Username  string

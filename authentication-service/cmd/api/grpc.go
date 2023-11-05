@@ -5,11 +5,14 @@ import (
 	"authentication-service/internal/models"
 	"context"
 	"fmt"
+	"google.golang.org/grpc"
+	"log"
+	"net"
 )
 
 type AuthServer struct {
 	auth.UnimplementedAuthServiceServer
-	User models.User
+	Models models.Models
 }
 
 func (a AuthServer) RegisterUser(ctx context.Context, req *auth.UserRequest) (*auth.UserResponse, error) {
@@ -31,4 +34,21 @@ func (a AuthServer) RegisterUser(ctx context.Context, req *auth.UserRequest) (*a
 	// return a response
 	res := &auth.UserResponse{Result: fmt.Sprintf("Inserted user!%d", id)}
 	return res, nil
+}
+
+func gRPCListen() {
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", gRpcPort))
+	if err != nil {
+		log.Fatalf("Failed to listen for gRPC: %v", err)
+	}
+
+	s := grpc.NewServer()
+
+	auth.RegisterAuthServiceServer(s, &AuthServer{Models: app.Models})
+
+	log.Printf("gRPC Server started on port %s", gRpcPort)
+
+	if err := s.Serve(lis); err != nil {
+		log.Fatalf("failed to listen for gRPC: %v", err)
+	}
 }

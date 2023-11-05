@@ -4,6 +4,7 @@ import (
 	"authentication-service/data"
 	"authentication-service/internal/config"
 	"authentication-service/internal/driver"
+	"authentication-service/internal/models"
 	"authentication-service/internal/repository/dbrepo"
 	"authentication-service/internal/routes"
 	"fmt"
@@ -19,17 +20,22 @@ import (
 )
 
 var authPort = os.Getenv("port")
+var gRpcPort = os.Getenv("gRpcPort")
 
 var app config.Config
 
 func main() {
 	db := driver.ConnectToDB()
-	app = config.Config{
-		DB: db,
-	}
 	data.MigrateUp()
 
-	_ = dbrepo.NewPostgresRepo(app.DB)
+	dbRepo := dbrepo.NewPostgresRepo(db)
+
+	app = config.Config{
+		DB:     dbRepo,
+		Models: models.New(),
+	}
+
+	go gRPCListen()
 
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", authPort),

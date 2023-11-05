@@ -33,14 +33,14 @@ type requestPayload struct {
 }
 
 // RegisterUser is an API endpoint that register a user and returns a JSON response.
-// @Tags user
+// @Tags Auth
 // @Summary Register a new user
 // @Description Registers a new user with the specified data.
 // @Accept json
 // @Produce json
 // @Param requestPayload body requestPayload true "User data"
 // @Success 202 {object} jsonResponse "Successful registration"
-// @Router /user [post]
+// @Router /auth/registration [post]
 func (app *Config) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	var requestPayload requestPayload
 

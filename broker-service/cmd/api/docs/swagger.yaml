@@ -35,7 +35,7 @@ paths:
           schema:
             $ref: '#/definitions/main.jsonResponse'
       summary: hit the broker
-  /user:
+  /auth/registration:
     post:
       consumes:
       - application/json
@@ -56,5 +56,5 @@ paths:
             $ref: '#/definitions/main.jsonResponse'
       summary: Register a new user
       tags:
-      - user
+      - Auth
 swagger: "2.0"

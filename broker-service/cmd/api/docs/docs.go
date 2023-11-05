@@ -33,7 +33,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user": {
+        "/auth/registration": {
             "post": {
                 "description": "Registers a new user with the specified data.",
                 "consumes": [
@@ -43,7 +43,7 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "Auth"
                 ],
                 "summary": "Register a new user",
                 "parameters": [

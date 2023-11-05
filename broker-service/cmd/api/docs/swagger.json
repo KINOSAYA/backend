@@ -26,7 +26,7 @@
                 }
             }
         },
-        "/user": {
+        "/auth/registration": {
             "post": {
                 "description": "Registers a new user with the specified data.",
                 "consumes": [
@@ -36,7 +36,7 @@
                     "application/json"
                 ],
                 "tags": [
-                    "user"
+                    "Auth"
                 ],
                 "summary": "Register a new user",
                 "parameters": [

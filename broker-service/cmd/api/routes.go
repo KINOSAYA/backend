@@ -29,5 +29,7 @@ func (app *Config) routes() http.Handler {
 		httpSwagger.URL(fmt.Sprintf("http://localhost:%s/swagger/doc.json", webPort)), //The url pointing to API definition
 	))
 
+	mux.Post("/user", app.RegisterUser)
+
 	return mux
 }

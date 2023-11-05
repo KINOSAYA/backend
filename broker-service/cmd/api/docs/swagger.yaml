@@ -8,6 +8,15 @@ definitions:
       message:
         type: string
     type: object
+  main.requestPayload:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+      username:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -26,4 +35,26 @@ paths:
           schema:
             $ref: '#/definitions/main.jsonResponse'
       summary: hit the broker
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user with the specified data.
+      parameters:
+      - description: User data
+        in: body
+        name: requestPayload
+        required: true
+        schema:
+          $ref: '#/definitions/main.requestPayload'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Successful registration
+          schema:
+            $ref: '#/definitions/main.jsonResponse'
+      summary: Register a new user
+      tags:
+      - user
 swagger: "2.0"

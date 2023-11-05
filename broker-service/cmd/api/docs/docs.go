@@ -32,6 +32,40 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user": {
+            "post": {
+                "description": "Registers a new user with the specified data.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Register a new user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "requestPayload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/main.requestPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Successful registration",
+                        "schema": {
+                            "$ref": "#/definitions/main.jsonResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -43,6 +77,20 @@ const docTemplate = `{
                     "type": "boolean"
                 },
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "main.requestPayload": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "username": {
                     "type": "string"
                 }
             }

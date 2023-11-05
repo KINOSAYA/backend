@@ -26,12 +26,23 @@ func (app *Config) broker(w http.ResponseWriter, r *http.Request) {
 	app.writeJSON(w, http.StatusOK, payload)
 }
 
+type requestPayload struct {
+	Username string `json:"username"`
+	Email    string `json:"email"`
+	Password string `json:"password"`
+}
+
+// RegisterUser is an API endpoint that register a user and returns a JSON response.
+// @Tags user
+// @Summary Register a new user
+// @Description Registers a new user with the specified data.
+// @Accept json
+// @Produce json
+// @Param requestPayload body requestPayload true "User data"
+// @Success 202 {object} jsonResponse "Successful registration"
+// @Router /user [post]
 func (app *Config) RegisterUser(w http.ResponseWriter, r *http.Request) {
-	var requestPayload struct {
-		Username string `json:"username"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
-	}
+	var requestPayload requestPayload
 
 	err := app.readJSON(w, r, &requestPayload)
 	if err != nil {

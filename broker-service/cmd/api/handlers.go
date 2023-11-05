@@ -4,10 +4,12 @@ import (
 	_ "broker-service/cmd/api/docs"
 	"broker-service/internal/auth"
 	"context"
+	"errors"
 	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -40,6 +42,7 @@ type requestPayload struct {
 // @Produce json
 // @Param requestPayload body requestPayload true "User data"
 // @Success 202 {object} jsonResponse "Successful registration"
+// @Failure 401 {object} jsonResponse "Invalid credentials"
 // @Router /auth/registration [post]
 func (app *Config) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	var requestPayload requestPayload
@@ -53,7 +56,6 @@ func (app *Config) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	//TODO rewrite hardcode authentication host!
 	conn, err := grpc.Dial(fmt.Sprintf("authentication-service:%s", authGrpcPort), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
-		app.errorJSON(w, err)
 		return
 	}
 	defer conn.Close()
@@ -70,7 +72,11 @@ func (app *Config) RegisterUser(w http.ResponseWriter, r *http.Request) {
 		},
 	})
 	if err != nil {
-		app.errorJSON(w, err)
+		if strings.Contains(err.Error(), "this email has already been used") {
+			app.errorJSON(w, errors.New("this email has already been used"), http.StatusUnauthorized)
+		} else {
+			app.errorJSON(w, errors.New("this username has already been used"), http.StatusUnauthorized)
+		}
 		return
 	}
 

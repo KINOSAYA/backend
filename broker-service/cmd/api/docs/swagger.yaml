@@ -54,6 +54,10 @@ paths:
           description: Successful registration
           schema:
             $ref: '#/definitions/main.jsonResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/main.jsonResponse'
       summary: Register a new user
       tags:
       - Auth

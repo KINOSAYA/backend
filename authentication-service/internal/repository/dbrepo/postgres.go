@@ -3,6 +3,7 @@ package dbrepo
 import (
 	"authentication-service/internal/models"
 	"context"
+	"errors"
 	"time"
 )
 
@@ -10,7 +11,7 @@ func (m *postgresDBRepo) GetUserByID(id int) (models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `select username, email, password, created_at, updated_at where id = $1`
+	query := `select username, email, password, created_at, updated_at from users where id = $1`
 
 	var user models.User
 	err := m.DB.QueryRowContext(ctx, query, id).Scan(&user)
@@ -22,15 +23,29 @@ func (m *postgresDBRepo) GetUserByID(id int) (models.User, error) {
 }
 
 func (m *postgresDBRepo) AddUser(user models.User) (int, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
+
+	queue := `select email, username, password from users where email = $1`
+	rows, err := m.DB.QueryContext(ctx, queue, user.Email)
+	defer rows.Close()
+	if rows.Next() {
+		return 0, errors.New("this email has already been used")
+	}
+
+	queue = `select email, username, password from users where username = $1`
+	rows, err = m.DB.QueryContext(ctx, queue, user.Username)
+	defer rows.Close()
+	if rows.Next() {
+		return 0, errors.New("this username has already been used")
+	}
 
 	var newID int
 	stmt := `insert into users (username, email, password,
                    created_at, updated_at)
                    values ($1, $2, $3, $4, $5) returning id`
 
-	err := m.DB.QueryRowContext(ctx, stmt,
+	err = m.DB.QueryRowContext(ctx, stmt,
 		user.Username,
 		user.Email,
 		user.Password,

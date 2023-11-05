@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  main.jsonResponse:
+  handlers.jsonResponse:
     properties:
       data: {}
       error:
@@ -8,7 +8,7 @@ definitions:
       message:
         type: string
     type: object
-  main.requestPayload:
+  handlers.requestPayload:
     properties:
       email:
         type: string
@@ -33,9 +33,9 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/main.jsonResponse'
+            $ref: '#/definitions/handlers.jsonResponse'
       summary: hit the broker
-  /auth/registration:
+  /auth/login:
     post:
       consumes:
       - application/json
@@ -46,19 +46,45 @@ paths:
         name: requestPayload
         required: true
         schema:
-          $ref: '#/definitions/main.requestPayload'
+          $ref: '#/definitions/handlers.requestPayload'
       produces:
       - application/json
       responses:
         "202":
           description: Successful registration
           schema:
-            $ref: '#/definitions/main.jsonResponse'
+            $ref: '#/definitions/handlers.jsonResponse'
         "401":
           description: Invalid credentials
           schema:
-            $ref: '#/definitions/main.jsonResponse'
+            $ref: '#/definitions/handlers.jsonResponse'
       summary: Register a new user
+      tags:
+      - Auth
+  /auth/registration:
+    post:
+      consumes:
+      - application/json
+      description: Logs in a user with the given data.
+      parameters:
+      - description: User data
+        in: body
+        name: requestPayload
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.requestPayload'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Successful registration
+          schema:
+            $ref: '#/definitions/handlers.jsonResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/handlers.jsonResponse'
+      summary: Logs a user
       tags:
       - Auth
 swagger: "2.0"

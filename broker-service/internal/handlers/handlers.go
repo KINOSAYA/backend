@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	_ "broker-service/cmd/api/docs"
+	_ "broker-service/docs"
 	"broker-service/internal/auth"
 	"broker-service/internal/helpers"
 	"context"
@@ -17,16 +17,25 @@ import (
 type Handler interface {
 	Broker(w http.ResponseWriter, r *http.Request)
 	RegisterUser(w http.ResponseWriter, r *http.Request)
+	LoginUser(w http.ResponseWriter, r *http.Request)
 }
 
-func NewBrokerHandler(AuthGrpcPort string) Handler {
+func NewBrokerHandler(AuthGrpcPort, authHost string) Handler {
 	return &brokerHandler{
 		AuthGrpcPort: AuthGrpcPort,
+		AuthHost:     authHost,
 	}
 }
 
 type brokerHandler struct {
 	AuthGrpcPort string
+	AuthHost     string
+}
+
+type jsonResponse struct {
+	Error   bool   `json:"error"`
+	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // Broker is a sample API endpoint that returns a JSON response.
@@ -59,7 +68,7 @@ type requestPayload struct {
 // @Param requestPayload body requestPayload true "User data"
 // @Success 202 {object} jsonResponse "Successful registration"
 // @Failure 401 {object} jsonResponse "Invalid credentials"
-// @Router /auth/registration [post]
+// @Router /auth/login [post]
 func (app *brokerHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	var requestPayload requestPayload
 
@@ -70,7 +79,7 @@ func (app *brokerHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//TODO rewrite hardcode authentication host!
-	conn, err := grpc.Dial(fmt.Sprintf("authentication-service:%s", app.AuthGrpcPort), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", app.AuthHost, app.AuthGrpcPort), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
 	if err != nil {
 		return
 	}
@@ -103,4 +112,19 @@ func (app *brokerHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = helpers.WriteJSON(w, http.StatusAccepted, payload)
+}
+
+// LoginUser is an API endpoint that register a user and returns a JSON response.
+// @Tags Auth
+// @Summary Logs a user
+// @Description Logs in a user with the given data.
+// @Accept json
+// @Produce json
+// @Param requestPayload body requestPayload true "User data"
+// @Success 202 {object} jsonResponse "Successful registration"
+// @Failure 401 {object} jsonResponse "Invalid credentials"
+// @Router /auth/registration [post]
+func (app *brokerHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
+	//TODO implement me
+	panic("implement me")
 }

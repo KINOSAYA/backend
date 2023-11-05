@@ -1,4 +1,4 @@
-package routers
+package routes
 
 import (
 	"broker-service/internal/handlers"
@@ -19,7 +19,7 @@ type ChiRouters struct {
 	WebPort string
 }
 
-func NewChiRouters(newHandler handlers.Handler, webPort string) *ChiRouters {
+func NewChiRouter(newHandler handlers.Handler, webPort string) *ChiRouters {
 	return &ChiRouters{
 		Handler: newHandler,
 		WebPort: webPort,
@@ -48,6 +48,7 @@ func (chiRouter *ChiRouters) GetRoutes() http.Handler {
 
 	mux.Route("/auth", func(mux chi.Router) {
 		mux.Post("/registration", chiRouter.Handler.RegisterUser)
+		mux.Post("/login", chiRouter.Handler.LoginUser)
 	})
 
 	return mux

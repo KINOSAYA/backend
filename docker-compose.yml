@@ -13,6 +13,8 @@ services:
       replicas: 1
     environment:
       authGrpcPort: "50001"
+      authHost: "authentication-service"
+      webPort: "8080"
 
   authentication-service:
     build:

@@ -1,15 +1,15 @@
 package config
 
 import (
-	"broker-service/internal/routers"
+	"broker-service/internal/routes"
 )
 
-func NewConfig(router routers.Router) *Config {
+func NewConfig(router routes.Router) *Config {
 	return &Config{
 		Router: router,
 	}
 }
 
 type Config struct {
-	Router routers.Router
+	Router routes.Router
 }

@@ -27,13 +27,13 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/main.jsonResponse"
+                            "$ref": "#/definitions/handlers.jsonResponse"
                         }
                     }
                 }
             }
         },
-        "/auth/registration": {
+        "/auth/login": {
             "post": {
                 "description": "Registers a new user with the specified data.",
                 "consumes": [
@@ -53,7 +53,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/main.requestPayload"
+                            "$ref": "#/definitions/handlers.requestPayload"
                         }
                     }
                 ],
@@ -61,13 +61,53 @@ const docTemplate = `{
                     "202": {
                         "description": "Successful registration",
                         "schema": {
-                            "$ref": "#/definitions/main.jsonResponse"
+                            "$ref": "#/definitions/handlers.jsonResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid credentials",
                         "schema": {
-                            "$ref": "#/definitions/main.jsonResponse"
+                            "$ref": "#/definitions/handlers.jsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/auth/registration": {
+            "post": {
+                "description": "Logs in a user with the given data.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Logs a user",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "requestPayload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.requestPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Successful registration",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.jsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.jsonResponse"
                         }
                     }
                 }
@@ -75,7 +115,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "main.jsonResponse": {
+        "handlers.jsonResponse": {
             "type": "object",
             "properties": {
                 "data": {},
@@ -87,7 +127,7 @@ const docTemplate = `{
                 }
             }
         },
-        "main.requestPayload": {
+        "handlers.requestPayload": {
             "type": "object",
             "properties": {
                 "email": {

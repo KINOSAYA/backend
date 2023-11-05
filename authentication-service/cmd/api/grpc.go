@@ -27,12 +27,19 @@ func (a AuthServer) RegisterUser(ctx context.Context, req *auth.UserRequest) (*a
 
 	id, err := app.DB.AddUser(user)
 	if err != nil {
-		res := &auth.UserResponse{Result: fmt.Sprintf("smth got wrong: %s", err)}
+		res := &auth.UserResponse{Message: fmt.Sprintf("smth got wrong: %s", err)}
 		return res, err
 	}
 
 	// return a response
-	res := &auth.UserResponse{Result: fmt.Sprintf("Inserted user!%d", id)}
+	//TODO generate token
+	res := &auth.UserResponse{
+		Message: "Inserted user!",
+		Data: &auth.ResponseData{
+			ID:    uint64(id),
+			Token: "tempToken",
+		},
+	}
 	return res, nil
 }
 

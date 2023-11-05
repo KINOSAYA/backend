@@ -76,7 +76,8 @@ func (app *Config) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	payload := jsonResponse{
 		Error:   false,
-		Message: userResponse.Result,
+		Message: userResponse.Message,
+		Data:    userResponse.Data,
 	}
 
 	app.writeJSON(w, http.StatusAccepted, payload)

@@ -14,8 +14,14 @@ message UserRequest {
   User userEntry = 1;
 }
 
+message ResponseData {
+  uint64 ID = 1;
+  string token = 2;
+}
+
 message UserResponse {
-  string result = 1;
+  string message = 1;
+  ResponseData data = 2;
 }
 
 service AuthService {

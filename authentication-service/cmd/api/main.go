@@ -37,6 +37,7 @@ func main() {
 
 	go gRPCListen()
 
+	// IDK what to do with server because he is useless
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", authPort),
 		Handler: routes.GetRoutes(),

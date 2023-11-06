@@ -16,7 +16,7 @@ import (
 
 type Handler interface {
 	Broker(w http.ResponseWriter, r *http.Request)
-	AuthRegisterUser(w http.ResponseWriter, r *http.Request)
+	AuthUser(w http.ResponseWriter, r *http.Request)
 	AuthLoginUser(w http.ResponseWriter, r *http.Request)
 }
 
@@ -59,7 +59,7 @@ type requestPayload struct {
 	Password string `json:"password"`
 }
 
-// AuthRegisterUser is an API endpoint that register a user and returns a JSON response.
+// AuthUser is an API endpoint that register a user and returns a JSON response.
 // @Tags Auth
 // @Summary Register a new user
 // @Description Registers a new user with the specified data.
@@ -68,8 +68,8 @@ type requestPayload struct {
 // @Param requestPayload body requestPayload true "User data"
 // @Success 202 {object} jsonResponse "Successful registration"
 // @Failure 401 {object} jsonResponse "Invalid credentials"
-// @Router /auth/register [post]
-func (app *brokerHandler) AuthRegisterUser(w http.ResponseWriter, r *http.Request) {
+// @Router /auth/registration [post]
+func (app *brokerHandler) AuthUser(w http.ResponseWriter, r *http.Request) {
 	var requestPayload requestPayload
 
 	err := helpers.ReadJSON(w, r, &requestPayload)

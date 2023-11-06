@@ -73,7 +73,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/register": {
+        "/auth/registration": {
             "post": {
                 "description": "Registers a new user with the specified data.",
                 "consumes": [

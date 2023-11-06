@@ -5,6 +5,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"golang.org/x/crypto/bcrypt"
 	"time"
 )
 
@@ -13,26 +14,32 @@ func (m *postgresDBRepo) Authenticate(email, username, password string) (int, er
 	defer cancel()
 	var query string
 	var queryParam string
+	var hashedPasswordFromDB string
 	if email != "" {
 		queryParam = email
-		query = `select id from users where email = $1 and password = $2`
+		query = `select id, password from users where email = $1`
 	} else {
 		queryParam = username
-		query = `select id from users where username = $1 and password = $2`
+		query = `select id, password from users where username = $1`
 	}
 
-	var newUserFromDB models.User
-
-	err := m.DB.QueryRowContext(ctx, query, queryParam, password).Scan(&newUserFromDB.ID)
+	var ID int
+	err := m.DB.QueryRowContext(ctx, query, queryParam).Scan(&ID, &hashedPasswordFromDB)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
-		return 0, errors.New("there is now user with this credentials")
+		return 0, errors.New("there is now user with these credentials")
 	case err != nil:
 		return 0, err
 	default:
-		return newUserFromDB.ID, nil
+		break
 	}
 
+	err = bcrypt.CompareHashAndPassword([]byte(hashedPasswordFromDB), []byte(password))
+	if err != nil {
+		return 0, err
+	}
+
+	return ID, nil
 }
 
 func (m *postgresDBRepo) AddUser(user models.User) (int, error) {
@@ -58,10 +65,12 @@ func (m *postgresDBRepo) AddUser(user models.User) (int, error) {
                    created_at, updated_at)
                    values ($1, $2, $3, $4, $5) returning id`
 
+	hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 3)
+
 	err = m.DB.QueryRowContext(ctx, stmt,
 		user.Username,
 		user.Email,
-		user.Password,
+		hashedPassword,
 		time.Now(),
 		time.Now(),
 	).Scan(&newID)
@@ -105,6 +114,3 @@ func (m *postgresDBRepo) DeleteUser(user models.User) error {
 	}
 	return nil
 }
-
-//TODO implement encrypting password to DB
-//TODO implement decrypting password from DB

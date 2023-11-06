@@ -61,7 +61,7 @@ paths:
       summary: Logs a user
       tags:
       - Auth
-  /auth/register:
+  /auth/registration:
     post:
       consumes:
       - application/json

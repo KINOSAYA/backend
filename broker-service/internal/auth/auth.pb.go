@@ -295,9 +295,9 @@ var file_auth_proto_goTypes = []interface{}{
 var file_auth_proto_depIdxs = []int32{
 	0, // 0: auth.UserRequest.userEntry:type_name -> auth.User
 	2, // 1: auth.UserResponse.data:type_name -> auth.ResponseData
-	1, // 2: auth.AuthService.AuthRegisterUser:input_type -> auth.UserRequest
+	1, // 2: auth.AuthService.RegisterUser:input_type -> auth.UserRequest
 	1, // 3: auth.AuthService.AuthUser:input_type -> auth.UserRequest
-	3, // 4: auth.AuthService.AuthRegisterUser:output_type -> auth.UserResponse
+	3, // 4: auth.AuthService.RegisterUser:output_type -> auth.UserResponse
 	3, // 5: auth.AuthService.AuthUser:output_type -> auth.UserResponse
 	4, // [4:6] is the sub-list for method output_type
 	2, // [2:4] is the sub-list for method input_type

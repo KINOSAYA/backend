@@ -39,32 +39,6 @@ paths:
     post:
       consumes:
       - application/json
-      description: Registers a new user with the specified data.
-      parameters:
-      - description: User data
-        in: body
-        name: requestPayload
-        required: true
-        schema:
-          $ref: '#/definitions/handlers.requestPayload'
-      produces:
-      - application/json
-      responses:
-        "202":
-          description: Successful registration
-          schema:
-            $ref: '#/definitions/handlers.jsonResponse'
-        "401":
-          description: Invalid credentials
-          schema:
-            $ref: '#/definitions/handlers.jsonResponse'
-      summary: Register a new user
-      tags:
-      - Auth
-  /auth/registration:
-    post:
-      consumes:
-      - application/json
       description: Logs in a user with the given data.
       parameters:
       - description: User data
@@ -85,6 +59,32 @@ paths:
           schema:
             $ref: '#/definitions/handlers.jsonResponse'
       summary: Logs a user
+      tags:
+      - Auth
+  /auth/register:
+    post:
+      consumes:
+      - application/json
+      description: Registers a new user with the specified data.
+      parameters:
+      - description: User data
+        in: body
+        name: requestPayload
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.requestPayload'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Successful registration
+          schema:
+            $ref: '#/definitions/handlers.jsonResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/handlers.jsonResponse'
+      summary: Register a new user
       tags:
       - Auth
 swagger: "2.0"

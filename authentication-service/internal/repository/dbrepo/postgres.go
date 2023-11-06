@@ -7,19 +7,23 @@ import (
 	"time"
 )
 
-func (m *postgresDBRepo) GetUserByID(id int) (models.User, error) {
+func (m *postgresDBRepo) GetUserByEmail(user models.User) (models.User, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 
-	query := `select username, email, password, created_at, updated_at from users where id = $1`
+	query := `select username, email, password, created_at, updated_at from users where email = $1 and password = $2`
 
-	var user models.User
-	err := m.DB.QueryRowContext(ctx, query, id).Scan(&user)
+	//var user models.User
+	err := m.DB.QueryRowContext(ctx, query, user.ID).Scan(&user)
 	if err != nil {
 		return models.User{}, err
 	}
 
 	return user, nil
+}
+
+func (m *postgresDBRepo) GetUserByUsername(user models.User) (models.User, error) {
+	panic("some")
 }
 
 func (m *postgresDBRepo) AddUser(user models.User) (int, error) {

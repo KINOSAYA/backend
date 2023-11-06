@@ -5,7 +5,8 @@ import (
 )
 
 type DatabaseRepo interface {
-	GetUserByID(id int) (models.User, error)
+	GetUserByEmail(user models.User) (models.User, error)
+	GetUserByUsername(user models.User) (models.User, error)
 
 	AddUser(user models.User) (int, error)
 

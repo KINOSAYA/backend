@@ -68,7 +68,7 @@ type requestPayload struct {
 // @Param requestPayload body requestPayload true "User data"
 // @Success 202 {object} jsonResponse "Successful registration"
 // @Failure 401 {object} jsonResponse "Invalid credentials"
-// @Router /auth/login [post]
+// @Router /auth/register [post]
 func (app *brokerHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	var requestPayload requestPayload
 
@@ -123,8 +123,12 @@ func (app *brokerHandler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 // @Param requestPayload body requestPayload true "User data"
 // @Success 202 {object} jsonResponse "Successful registration"
 // @Failure 401 {object} jsonResponse "Invalid credentials"
-// @Router /auth/registration [post]
+// @Router /auth/login [post]
 func (app *brokerHandler) LoginUser(w http.ResponseWriter, r *http.Request) {
 	//TODO implement me
+	//TODO request to auth service
+
+	// TODO got response
+
 	panic("implement me")
 }

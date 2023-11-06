@@ -59,3 +59,22 @@ func gRPCListen() {
 		log.Fatalf("failed to listen for gRPC: %v", err)
 	}
 }
+
+func (a AuthServer) AuthUser(ctx context.Context, req *auth.UserRequest) (*auth.UserResponse, error) {
+	input := req.GetUserEntry()
+
+	//TODO search for user in DB
+	user := models.User{
+		Username: input.Username,
+		Email:    input.Email,
+		Password: input.Password,
+	}
+
+	user, err := app.DB.GetUserByEmail(user)
+	if err != nil {
+		return nil, err
+	}
+
+	panic("some")
+
+}

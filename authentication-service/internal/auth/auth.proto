@@ -26,4 +26,5 @@ message UserResponse {
 
 service AuthService {
   rpc RegisterUser(UserRequest) returns (UserResponse);
+  rpc AuthUser(UserRequest) returns (UserResponse);
 }

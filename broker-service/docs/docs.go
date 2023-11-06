@@ -35,7 +35,7 @@ const docTemplate = `{
         },
         "/auth/login": {
             "post": {
-                "description": "Registers a new user with the specified data.",
+                "description": "Logs in a user with the given data.",
                 "consumes": [
                     "application/json"
                 ],
@@ -45,7 +45,7 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Register a new user",
+                "summary": "Logs a user",
                 "parameters": [
                     {
                         "description": "User data",
@@ -73,9 +73,9 @@ const docTemplate = `{
                 }
             }
         },
-        "/auth/registration": {
+        "/auth/register": {
             "post": {
-                "description": "Logs in a user with the given data.",
+                "description": "Registers a new user with the specified data.",
                 "consumes": [
                     "application/json"
                 ],
@@ -85,7 +85,7 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Logs a user",
+                "summary": "Register a new user",
                 "parameters": [
                     {
                         "description": "User data",

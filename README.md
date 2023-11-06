@@ -10,7 +10,7 @@ To run the Kinosaya backend application, follow these steps:
 
 2. Clone the Kinosaya repository to your local machine:
    ```bash
-   git clone https://github.com/your-username/kinosaya-backend.git
+   git clone https://github.com/KINOSAYA/backend.git
    ```
 3. Navigate to the main directory
 4. Run the current command from makefile:

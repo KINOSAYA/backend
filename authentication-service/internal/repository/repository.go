@@ -5,8 +5,7 @@ import (
 )
 
 type DatabaseRepo interface {
-	GetUserByEmail(user models.User) (models.User, error)
-	GetUserByUsername(user models.User) (models.User, error)
+	Authenticate(email, username, password string) (int, error)
 
 	AddUser(user models.User) (int, error)
 

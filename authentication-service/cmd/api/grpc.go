@@ -70,11 +70,18 @@ func (a AuthServer) AuthUser(ctx context.Context, req *auth.UserRequest) (*auth.
 		Password: input.Password,
 	}
 
-	user, err := app.DB.GetUserByEmail(user)
+	id, err := app.DB.Authenticate(user.Email, user.Username, user.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	panic("some")
-
+	//TODO generate token
+	res := &auth.UserResponse{
+		Message: "Got user from DB",
+		Data: &auth.ResponseData{
+			ID:    uint64(id),
+			Token: "tempToken",
+		},
+	}
+	return res, nil
 }

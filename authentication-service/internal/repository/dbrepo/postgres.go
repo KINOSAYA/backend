@@ -15,15 +15,15 @@ func (m *postgresDBRepo) Authenticate(email, username, password string) (int, er
 	var queryParam string
 	if email != "" {
 		queryParam = email
-		query = `select username, email, password, created_at, updated_at from users where email = $1 and password = $2`
+		query = `select id from users where email = $1 and password = $2`
 	} else {
 		queryParam = username
-		query = `select username, email, password, created_at, updated_at from users where username = $1 and password = $2`
+		query = `select id from users where username = $1 and password = $2`
 	}
 
 	var newUserFromDB models.User
 
-	err := m.DB.QueryRowContext(ctx, query, queryParam, password).Scan(&newUserFromDB)
+	err := m.DB.QueryRowContext(ctx, query, queryParam, password).Scan(&newUserFromDB.ID)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
 		return 0, errors.New("there is now user with this credentials")

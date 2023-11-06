@@ -36,7 +36,7 @@ func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
 
 func (c *authServiceClient) RegisterUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error) {
 	out := new(UserResponse)
-	err := c.cc.Invoke(ctx, "/auth.AuthService/RegisterUser", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/auth.AuthService/AuthRegisterUser", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +66,7 @@ type UnimplementedAuthServiceServer struct {
 }
 
 func (UnimplementedAuthServiceServer) RegisterUser(context.Context, *UserRequest) (*UserResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method RegisterUser not implemented")
+	return nil, status.Errorf(codes.Unimplemented, "method AuthRegisterUser not implemented")
 }
 func (UnimplementedAuthServiceServer) AuthUser(context.Context, *UserRequest) (*UserResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AuthUser not implemented")
@@ -94,7 +94,7 @@ func _AuthService_RegisterUser_Handler(srv interface{}, ctx context.Context, dec
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/auth.AuthService/RegisterUser",
+		FullMethod: "/auth.AuthService/AuthRegisterUser",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(AuthServiceServer).RegisterUser(ctx, req.(*UserRequest))
@@ -128,7 +128,7 @@ var AuthService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*AuthServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "RegisterUser",
+			MethodName: "AuthRegisterUser",
 			Handler:    _AuthService_RegisterUser_Handler,
 		},
 		{

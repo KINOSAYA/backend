@@ -66,6 +66,46 @@
                 }
             }
         },
+        "/auth/parse-token": {
+            "post": {
+                "description": "temp handler",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Parser a token",
+                "parameters": [
+                    {
+                        "description": "User data",
+                        "name": "requestPayload",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.tempTokenReqPayload"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Successful registration",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.tempTokenResponsePayload"
+                        }
+                    },
+                    "401": {
+                        "description": "Invalid credentials",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.tempTokenResponsePayload"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/registration": {
             "post": {
                 "description": "Registers a new user with the specified data.",
@@ -128,6 +168,25 @@
                 },
                 "password": {
                     "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.tempTokenReqPayload": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.tempTokenResponsePayload": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "integer"
                 },
                 "username": {
                     "type": "string"

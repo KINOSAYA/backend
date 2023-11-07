@@ -24,7 +24,18 @@ message UserResponse {
   ResponseData data = 2;
 }
 
+message TokenRequest {
+  string tokenString = 1;
+}
+
+
+message TokenResponse {
+  uint64 id = 1;
+  string username = 2;
+}
+
 service AuthService {
   rpc RegisterUser(UserRequest) returns (UserResponse);
   rpc AuthUser(UserRequest) returns (UserResponse);
+  rpc CheckToken(TokenRequest) returns (TokenResponse);
 }

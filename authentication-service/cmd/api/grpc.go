@@ -3,6 +3,7 @@ package main
 import (
 	"authentication-service/internal/auth"
 	"authentication-service/internal/models"
+	"authentication-service/internal/service"
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
@@ -12,7 +13,8 @@ import (
 
 type AuthServer struct {
 	auth.UnimplementedAuthServiceServer
-	Models models.Models
+	Models  models.Models
+	Service service.AuthorizationService
 }
 
 func (a AuthServer) RegisterUser(ctx context.Context, req *auth.UserRequest) (*auth.UserResponse, error) {
@@ -32,12 +34,15 @@ func (a AuthServer) RegisterUser(ctx context.Context, req *auth.UserRequest) (*a
 	}
 
 	// return a response
-	//TODO generate token
+	token, err := a.Service.GenerateToken(id, user.Username)
+	if err != nil {
+		return nil, err
+	}
 	res := &auth.UserResponse{
 		Message: "Inserted user!",
 		Data: &auth.ResponseData{
 			ID:    uint64(id),
-			Token: "tempToken",
+			Token: token,
 		},
 	}
 	return res, nil
@@ -51,7 +56,10 @@ func gRPCListen() {
 
 	s := grpc.NewServer()
 
-	auth.RegisterAuthServiceServer(s, &AuthServer{Models: app.Models})
+	auth.RegisterAuthServiceServer(s, &AuthServer{
+		Models:  app.Models,
+		Service: app.Service,
+	})
 
 	log.Printf("gRPC Server started on port %s", gRpcPort)
 
@@ -63,25 +71,42 @@ func gRPCListen() {
 func (a AuthServer) AuthUser(ctx context.Context, req *auth.UserRequest) (*auth.UserResponse, error) {
 	input := req.GetUserEntry()
 
-	//TODO search for user in DB
 	user := models.User{
 		Username: input.Username,
 		Email:    input.Email,
 		Password: input.Password,
 	}
 
-	id, err := app.DB.Authenticate(user.Email, user.Username, user.Password)
+	id, username, err := app.DB.Authenticate(user.Email, user.Username, user.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	//TODO generate token
+	generatedToken, err := a.Service.GenerateToken(id, username)
+	if err != nil {
+		return nil, err
+	}
 	res := &auth.UserResponse{
-		Message: "Got user from DB",
+		Message: "Successfully authenticated!",
 		Data: &auth.ResponseData{
 			ID:    uint64(id),
-			Token: "tempToken",
+			Token: generatedToken,
 		},
 	}
+	return res, nil
+}
+
+func (a AuthServer) CheckToken(ctx context.Context, req *auth.TokenRequest) (*auth.TokenResponse, error) {
+	tokenString := req.GetTokenString()
+	id, username, err := a.Service.ParseToken(tokenString)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &auth.TokenResponse{
+		Id:       uint64(id),
+		Username: username,
+	}
+
 	return res, nil
 }

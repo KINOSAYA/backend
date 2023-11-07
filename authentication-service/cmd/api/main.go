@@ -7,6 +7,7 @@ import (
 	"authentication-service/internal/models"
 	"authentication-service/internal/repository/dbrepo"
 	"authentication-service/internal/routes"
+	"authentication-service/internal/service"
 	"fmt"
 	"log"
 	"net/http"
@@ -29,10 +30,11 @@ func main() {
 	data.MigrateUp()
 
 	dbRepo := dbrepo.NewPostgresRepo(db)
-
+	authService := service.NewAuthService(dbRepo)
 	app = config.Config{
-		DB:     dbRepo,
-		Models: models.New(),
+		DB:      dbRepo,
+		Models:  models.New(),
+		Service: authService,
 	}
 
 	go gRPCListen()

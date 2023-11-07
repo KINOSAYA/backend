@@ -4,6 +4,7 @@ import (
 	"authentication-service/internal/repository"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
+	"log"
 	"time"
 )
 
@@ -17,9 +18,10 @@ type AuthService struct {
 }
 
 type MyCustomClaims struct {
-	ID        int       `json:"id"`
-	Username  string    `json:"username"`
-	ExpiresAt time.Time `json:"expiresAt"`
+	ID        int    `json:"id"`
+	Username  string `json:"username"`
+	IssuedAt  int64  `json:"issuedAt"`
+	ExpiresAt int64  `json:"expiresAt"`
 	jwt.RegisteredClaims
 }
 
@@ -30,12 +32,13 @@ const (
 
 func (a AuthService) GenerateToken(id int, username string) (string, error) {
 
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"id":        id,
-		"username":  username,
-		"issuedAt":  time.Now().Unix(),
-		"expiresAt": time.Now().Add(duration).Unix(),
-	})
+	claims := MyCustomClaims{
+		ID:        id,
+		Username:  username,
+		IssuedAt:  time.Now().Unix(),
+		ExpiresAt: time.Now().Add(duration).Unix(),
+	}
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 
 	// Sign and get the complete encoded token as a string using the secret
 	tokenString, err := token.SignedString([]byte(hmacSampleSecret))
@@ -50,12 +53,18 @@ func (a AuthService) ParseToken(tokenString string) (int, string, error) {
 	token, err := jwt.ParseWithClaims(tokenString, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(hmacSampleSecret), nil
 	})
+	if err != nil {
+		log.Printf("error parsing tokenString, %v\n", err)
+		return 0, "", err
+	}
+
+	log.Println("token is", token)
 	// TODO check expiry date!
 	if claims, ok := token.Claims.(*MyCustomClaims); ok && token.Valid {
 		fmt.Printf("%v %v %v", claims.ID, claims.Username, claims.ExpiresAt)
 		return claims.ID, claims.Username, nil
 	} else {
-		fmt.Println(err)
+		fmt.Printf("error in casting to MyCustomClaims, %v\n", err)
 		return 0, "", err
 	}
 }

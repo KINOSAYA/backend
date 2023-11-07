@@ -2,10 +2,16 @@ package service
 
 import (
 	"authentication-service/internal/repository"
+	"errors"
 	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"log"
 	"time"
+)
+
+const (
+	hmacSampleSecret = "secret"
+	duration         = time.Hour * 24
 )
 
 type AuthorizationService interface {
@@ -24,11 +30,6 @@ type MyCustomClaims struct {
 	ExpiresAt int64  `json:"expiresAt"`
 	jwt.RegisteredClaims
 }
-
-const (
-	hmacSampleSecret = "secret"
-	duration         = time.Hour * 24
-)
 
 func (a AuthService) GenerateToken(id int, username string) (string, error) {
 
@@ -58,10 +59,11 @@ func (a AuthService) ParseToken(tokenString string) (int, string, error) {
 		return 0, "", err
 	}
 
-	log.Println("token is", token)
-	// TODO check expiry date!
 	if claims, ok := token.Claims.(*MyCustomClaims); ok && token.Valid {
 		fmt.Printf("%v %v %v", claims.ID, claims.Username, claims.ExpiresAt)
+		if claims.ExpiresAt < time.Now().Unix() {
+			return 0, "", errors.New("token expired")
+		}
 		return claims.ID, claims.Username, nil
 	} else {
 		fmt.Printf("error in casting to MyCustomClaims, %v\n", err)

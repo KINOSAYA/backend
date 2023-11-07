@@ -9,37 +9,38 @@ import (
 	"time"
 )
 
-func (m *postgresDBRepo) Authenticate(email, username, password string) (int, error) {
+func (m *postgresDBRepo) Authenticate(email, username, password string) (int, string, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	var query string
 	var queryParam string
 	var hashedPasswordFromDB string
+	var usernameFromDB string
 	if email != "" {
 		queryParam = email
-		query = `select id, password from users where email = $1`
+		query = `select id, password, username from users where email = $1`
 	} else {
 		queryParam = username
-		query = `select id, password from users where username = $1`
+		query = `select id, password, username from users where username = $1`
 	}
 
 	var ID int
-	err := m.DB.QueryRowContext(ctx, query, queryParam).Scan(&ID, &hashedPasswordFromDB)
+	err := m.DB.QueryRowContext(ctx, query, queryParam).Scan(&ID, &hashedPasswordFromDB, &usernameFromDB)
 	switch {
 	case errors.Is(err, sql.ErrNoRows):
-		return 0, errors.New("there is now user with these credentials")
+		return 0, "", errors.New("there is now user with these credentials")
 	case err != nil:
-		return 0, err
+		return 0, "", err
 	default:
 		break
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(hashedPasswordFromDB), []byte(password))
 	if err != nil {
-		return 0, err
+		return 0, "", err
 	}
 
-	return ID, nil
+	return ID, usernameFromDB, nil
 }
 
 func (m *postgresDBRepo) AddUser(user models.User) (int, error) {

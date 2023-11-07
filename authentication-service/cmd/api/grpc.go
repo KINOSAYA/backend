@@ -34,7 +34,6 @@ func (a AuthServer) RegisterUser(ctx context.Context, req *auth.UserRequest) (*a
 	}
 
 	// return a response
-	//TODO generate token
 	token, err := a.Service.GenerateToken(id, user.Username)
 	if err != nil {
 		return nil, err
@@ -72,24 +71,26 @@ func gRPCListen() {
 func (a AuthServer) AuthUser(ctx context.Context, req *auth.UserRequest) (*auth.UserResponse, error) {
 	input := req.GetUserEntry()
 
-	//TODO search for user in DB
 	user := models.User{
 		Username: input.Username,
 		Email:    input.Email,
 		Password: input.Password,
 	}
 
-	id, err := app.DB.Authenticate(user.Email, user.Username, user.Password)
+	id, username, err := app.DB.Authenticate(user.Email, user.Username, user.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	//TODO generate token
+	generatedToken, err := a.Service.GenerateToken(id, username)
+	if err != nil {
+		return nil, err
+	}
 	res := &auth.UserResponse{
-		Message: "Got user from DB",
+		Message: "Successfully authenticated!",
 		Data: &auth.ResponseData{
 			ID:    uint64(id),
-			Token: "tempToken",
+			Token: generatedToken,
 		},
 	}
 	return res, nil
@@ -97,7 +98,6 @@ func (a AuthServer) AuthUser(ctx context.Context, req *auth.UserRequest) (*auth.
 
 func (a AuthServer) CheckToken(ctx context.Context, req *auth.TokenRequest) (*auth.TokenResponse, error) {
 	tokenString := req.GetTokenString()
-	log.Println("token string is", tokenString)
 	id, username, err := a.Service.ParseToken(tokenString)
 	if err != nil {
 		return nil, err
@@ -109,5 +109,4 @@ func (a AuthServer) CheckToken(ctx context.Context, req *auth.TokenRequest) (*au
 	}
 
 	return res, nil
-
 }

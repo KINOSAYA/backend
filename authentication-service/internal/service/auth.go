@@ -2,6 +2,7 @@ package service
 
 import (
 	"authentication-service/internal/repository"
+	"fmt"
 	"github.com/golang-jwt/jwt/v5"
 	"time"
 )
@@ -29,7 +30,8 @@ func (a AuthService) GenerateToken(id int) (string, error) {
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
-	tokenString, err := token.SignedString(hmacSampleSecret)
+	tokenString, err := token.SignedString([]byte(hmacSampleSecret))
+	fmt.Println(tokenString, err)
 	if err != nil {
 		return "", err
 	}

@@ -3,6 +3,7 @@ package main
 import (
 	"authentication-service/internal/auth"
 	"authentication-service/internal/models"
+	"authentication-service/internal/service"
 	"context"
 	"fmt"
 	"google.golang.org/grpc"
@@ -12,7 +13,8 @@ import (
 
 type AuthServer struct {
 	auth.UnimplementedAuthServiceServer
-	Models models.Models
+	Models  models.Models
+	Service service.AuthorizationService
 }
 
 func (a AuthServer) RegisterUser(ctx context.Context, req *auth.UserRequest) (*auth.UserResponse, error) {
@@ -33,11 +35,15 @@ func (a AuthServer) RegisterUser(ctx context.Context, req *auth.UserRequest) (*a
 
 	// return a response
 	//TODO generate token
+	token, err := a.Service.GenerateToken(id)
+	if err != nil {
+		return nil, err
+	}
 	res := &auth.UserResponse{
 		Message: "Inserted user!",
 		Data: &auth.ResponseData{
 			ID:    uint64(id),
-			Token: "tempToken",
+			Token: token,
 		},
 	}
 	return res, nil
@@ -51,7 +57,10 @@ func gRPCListen() {
 
 	s := grpc.NewServer()
 
-	auth.RegisterAuthServiceServer(s, &AuthServer{Models: app.Models})
+	auth.RegisterAuthServiceServer(s, &AuthServer{
+		Models:  app.Models,
+		Service: app.Service,
+	})
 
 	log.Printf("gRPC Server started on port %s", gRpcPort)
 

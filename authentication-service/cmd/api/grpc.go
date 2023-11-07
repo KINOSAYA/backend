@@ -35,7 +35,7 @@ func (a AuthServer) RegisterUser(ctx context.Context, req *auth.UserRequest) (*a
 
 	// return a response
 	//TODO generate token
-	token, err := a.Service.GenerateToken(id)
+	token, err := a.Service.GenerateToken(id, user.Username)
 	if err != nil {
 		return nil, err
 	}

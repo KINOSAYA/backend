@@ -18,6 +18,7 @@ type Handler interface {
 	Broker(w http.ResponseWriter, r *http.Request)
 	AuthUser(w http.ResponseWriter, r *http.Request)
 	AuthLoginUser(w http.ResponseWriter, r *http.Request)
+	ParseToken(w http.ResponseWriter, r *http.Request)
 }
 
 func NewBrokerHandler(AuthGrpcPort, authHost string) Handler {
@@ -160,6 +161,59 @@ func (app *brokerHandler) AuthLoginUser(w http.ResponseWriter, r *http.Request) 
 		Error:   false,
 		Message: userResponse.Message,
 		Data:    userResponse.Data,
+	}
+
+	_ = helpers.WriteJSON(w, http.StatusAccepted, payload)
+}
+
+type tempTokenReqPayload struct {
+	TokenString string `json:"token"`
+}
+type tempTokenResponsePayload struct {
+	ID       int    `json:"token"`
+	Username string `json:"username"`
+}
+
+// ParseToken is an API endpoint that authenticate a user and returns a JSON response.
+// @Tags Auth
+// @Summary Parser a token
+// @Description temp handler
+// @Accept json
+// @Produce json
+// @Param requestPayload body tempTokenReqPayload true "User data"
+// @Success 202 {object} tempTokenResponsePayload "Successful registration"
+// @Failure 401 {object} tempTokenResponsePayload "Invalid credentials"
+// @Router /auth/parse-token [post]
+func (app *brokerHandler) ParseToken(w http.ResponseWriter, r *http.Request) {
+	var requestPayload tempTokenReqPayload
+
+	err := helpers.ReadJSON(w, r, &requestPayload)
+	if err != nil {
+		_ = helpers.ErrorJSON(w, err)
+		return
+	}
+
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", app.AuthHost, app.AuthGrpcPort), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	if err != nil {
+		return
+	}
+	defer conn.Close()
+
+	c := auth.NewAuthServiceClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	tokenResponse, err := c.CheckToken(ctx, &auth.TokenRequest{
+		TokenString: requestPayload.TokenString,
+	})
+	if err != nil {
+		_ = helpers.ErrorJSON(w, err, http.StatusUnauthorized)
+		return
+	}
+
+	payload := tempTokenResponsePayload{
+		ID:       int(tokenResponse.Id),
+		Username: tokenResponse.Username,
 	}
 
 	_ = helpers.WriteJSON(w, http.StatusAccepted, payload)

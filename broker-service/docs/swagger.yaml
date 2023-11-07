@@ -17,6 +17,18 @@ definitions:
       username:
         type: string
     type: object
+  handlers.tempTokenReqPayload:
+    properties:
+      token:
+        type: string
+    type: object
+  handlers.tempTokenResponsePayload:
+    properties:
+      token:
+        type: integer
+      username:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -59,6 +71,32 @@ paths:
           schema:
             $ref: '#/definitions/handlers.jsonResponse'
       summary: Logs a user
+      tags:
+      - Auth
+  /auth/parse-token:
+    post:
+      consumes:
+      - application/json
+      description: temp handler
+      parameters:
+      - description: User data
+        in: body
+        name: requestPayload
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.tempTokenReqPayload'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Successful registration
+          schema:
+            $ref: '#/definitions/handlers.tempTokenResponsePayload'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/handlers.tempTokenResponsePayload'
+      summary: Parser a token
       tags:
       - Auth
   /auth/registration:

@@ -9,7 +9,7 @@ import (
 
 type AuthorizationService interface {
 	GenerateToken(id int, username string) (string, error)
-	ParseToken(tokenString string) (int, error)
+	ParseToken(tokenString string) (int, string, error)
 }
 
 type AuthService struct {
@@ -32,7 +32,7 @@ func (a AuthService) GenerateToken(id int, username string) (string, error) {
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"id":        id,
-		"username":  id,
+		"username":  username,
 		"issuedAt":  time.Now().Unix(),
 		"expiresAt": time.Now().Add(duration).Unix(),
 	})
@@ -45,24 +45,18 @@ func (a AuthService) GenerateToken(id int, username string) (string, error) {
 	return tokenString, nil
 }
 
-func (a AuthService) ParseToken(tokenString string) (int, error) {
-
-	type MyCustomClaims struct {
-		ID       int `json:"id"`
-		Username int `json:"username"`
-		jwt.RegisteredClaims
-	}
+func (a AuthService) ParseToken(tokenString string) (int, string, error) {
 
 	token, err := jwt.ParseWithClaims(tokenString, &MyCustomClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(hmacSampleSecret), nil
 	})
-
+	// TODO check expiry date!
 	if claims, ok := token.Claims.(*MyCustomClaims); ok && token.Valid {
 		fmt.Printf("%v %v %v", claims.ID, claims.Username, claims.ExpiresAt)
-		return claims.ID, nil
+		return claims.ID, claims.Username, nil
 	} else {
 		fmt.Println(err)
-		return 0, err
+		return 0, "", err
 	}
 }
 

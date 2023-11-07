@@ -94,3 +94,19 @@ func (a AuthServer) AuthUser(ctx context.Context, req *auth.UserRequest) (*auth.
 	}
 	return res, nil
 }
+
+func (a AuthServer) CheckToken(ctx context.Context, req *auth.TokenRequest) (*auth.TokenResponse, error) {
+	tokenString := req.GetTokenString()
+	id, username, err := a.Service.ParseToken(tokenString)
+	if err != nil {
+		return nil, err
+	}
+
+	res := &auth.TokenResponse{
+		Id:       uint64(id),
+		Username: username,
+	}
+
+	return res, nil
+
+}

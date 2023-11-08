@@ -75,7 +75,7 @@ const docTemplate = `{
         },
         "/auth/parse-token": {
             "post": {
-                "description": "temp handler",
+                "description": "token validation (token is alive for 24 hours",
                 "consumes": [
                     "application/json"
                 ],
@@ -85,7 +85,7 @@ const docTemplate = `{
                 "tags": [
                     "Auth"
                 ],
-                "summary": "Parser a token",
+                "summary": "token parser",
                 "parameters": [
                     {
                         "description": "User data",
@@ -101,13 +101,13 @@ const docTemplate = `{
                     "202": {
                         "description": "Successful registration",
                         "schema": {
-                            "$ref": "#/definitions/handlers.tempTokenResponsePayload"
+                            "$ref": "#/definitions/handlers.jsonResponse"
                         }
                     },
                     "401": {
                         "description": "Invalid credentials",
                         "schema": {
-                            "$ref": "#/definitions/handlers.tempTokenResponsePayload"
+                            "$ref": "#/definitions/handlers.jsonResponse"
                         }
                     }
                 }
@@ -185,17 +185,6 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "token": {
-                    "type": "string"
-                }
-            }
-        },
-        "handlers.tempTokenResponsePayload": {
-            "type": "object",
-            "properties": {
-                "token": {
-                    "type": "integer"
-                },
-                "username": {
                     "type": "string"
                 }
             }

@@ -22,13 +22,6 @@ definitions:
       token:
         type: string
     type: object
-  handlers.tempTokenResponsePayload:
-    properties:
-      token:
-        type: integer
-      username:
-        type: string
-    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -77,7 +70,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: temp handler
+      description: token validation (token is alive for 24 hours
       parameters:
       - description: User data
         in: body
@@ -91,12 +84,12 @@ paths:
         "202":
           description: Successful registration
           schema:
-            $ref: '#/definitions/handlers.tempTokenResponsePayload'
+            $ref: '#/definitions/handlers.jsonResponse'
         "401":
           description: Invalid credentials
           schema:
-            $ref: '#/definitions/handlers.tempTokenResponsePayload'
-      summary: Parser a token
+            $ref: '#/definitions/handlers.jsonResponse'
+      summary: token parser
       tags:
       - Auth
   /auth/registration:

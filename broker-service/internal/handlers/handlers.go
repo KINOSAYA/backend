@@ -170,19 +170,19 @@ type tempTokenReqPayload struct {
 	TokenString string `json:"token"`
 }
 type tempTokenResponsePayload struct {
-	ID       int    `json:"token"`
+	ID       int    `json:"id"`
 	Username string `json:"username"`
 }
 
 // ParseToken is an API endpoint that authenticate a user and returns a JSON response.
 // @Tags Auth
-// @Summary Parser a token
-// @Description temp handler
+// @Summary token parser
+// @Description token validation (token is alive for 24 hours
 // @Accept json
 // @Produce json
 // @Param requestPayload body tempTokenReqPayload true "User data"
-// @Success 202 {object} tempTokenResponsePayload "Successful registration"
-// @Failure 401 {object} tempTokenResponsePayload "Invalid credentials"
+// @Success 202 {object} jsonResponse "Successful registration"
+// @Failure 401 {object} jsonResponse "Invalid credentials"
 // @Router /auth/parse-token [post]
 func (app *brokerHandler) ParseToken(w http.ResponseWriter, r *http.Request) {
 	var requestPayload tempTokenReqPayload
@@ -211,9 +211,13 @@ func (app *brokerHandler) ParseToken(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	payload := tempTokenResponsePayload{
-		ID:       int(tokenResponse.Id),
-		Username: tokenResponse.Username,
+	payload := jsonResponse{
+		Error:   false,
+		Message: "checked Token",
+		Data: tempTokenResponsePayload{
+			ID:       int(tokenResponse.Id),
+			Username: tokenResponse.Username,
+		},
 	}
 
 	_ = helpers.WriteJSON(w, http.StatusAccepted, payload)

@@ -6,6 +6,7 @@ import (
 	"broker-service/internal/handlers"
 	"broker-service/internal/routes"
 	"fmt"
+	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 	"net/http"
 	"os"
@@ -24,22 +25,31 @@ var authGrpcPort = os.Getenv("authGrpcPort")
 
 func main() {
 	// TODO: try to connect to rabbitmq
-
+	rabbitConn, err := connect()
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
 	// Dependency Injection
-	broker := handlers.NewBrokerHandler(authGrpcPort, authHost)
-	chiRouter := routes.NewChiRouter(broker, webPort)
-	app := config.NewConfig(chiRouter)
+	app := config.Config{Rabbit: rabbitConn}
+	broker := handlers.NewBrokerHandler(authGrpcPort, authHost, app.Rabbit)
+	router := routes.NewChiRouter(broker, webPort)
 
 	log.Printf("Starting broker service on port %s\n", webPort)
 
 	// define http server
 	srv := &http.Server{
 		Addr:    fmt.Sprintf(":%s", webPort),
-		Handler: app.Router.GetRoutes(),
+		Handler: router.GetRoutes(),
 	}
 
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	if err != nil {
 		log.Panic(err)
 	}
+}
+
+func connect() (*amqp.Connection, error) {
+
+	return nil, nil
 }

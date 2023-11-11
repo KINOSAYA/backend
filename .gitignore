@@ -2,3 +2,4 @@
 /broker-service/brokerApp
 /db-data
 /authentication-service/authApp
+/external-api-service/extApiService

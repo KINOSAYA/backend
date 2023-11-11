@@ -12,6 +12,8 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type Handler interface {
@@ -19,18 +21,22 @@ type Handler interface {
 	AuthUser(w http.ResponseWriter, r *http.Request)
 	AuthLoginUser(w http.ResponseWriter, r *http.Request)
 	ParseToken(w http.ResponseWriter, r *http.Request)
+
+	GetNewFilmsCollection(w http.ResponseWriter, r *http.Request)
 }
 
-func NewBrokerHandler(AuthGrpcPort, authHost string) Handler {
+func NewBrokerHandler(authGrpcPort, authHost string, rabbit *amqp.Connection) Handler {
 	return &brokerHandler{
-		AuthGrpcPort: AuthGrpcPort,
+		AuthGrpcPort: authGrpcPort,
 		AuthHost:     authHost,
+		Rabbit:       rabbit,
 	}
 }
 
 type brokerHandler struct {
 	AuthGrpcPort string
 	AuthHost     string
+	Rabbit       *amqp.Connection
 }
 
 type jsonResponse struct {

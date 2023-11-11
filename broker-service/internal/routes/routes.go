@@ -52,5 +52,9 @@ func (chiRouter *ChiRouters) GetRoutes() http.Handler {
 		mux.Post("/parse-token", chiRouter.Handler.ParseToken)
 	})
 
+	mux.Route("/collections", func(mux chi.Router) {
+		mux.Get("/new-films", chiRouter.Handler.GetNewFilmsCollection)
+	})
+
 	return mux
 }

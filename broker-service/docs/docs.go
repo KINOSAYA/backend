@@ -152,6 +152,26 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/collections/new-films": {
+            "get": {
+                "description": "this endpoint goes to kinopoisk API and gets a JSON data with new films",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Collections"
+                ],
+                "summary": "New Collections",
+                "responses": {
+                    "200": {
+                        "description": "Successful registration",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.jsonResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {

@@ -7,7 +7,14 @@ import (
 	"net/http"
 )
 
-func (app brokerHandler) GetNewFilmsCollection(w http.ResponseWriter, r *http.Request) {
+// GetNewFilmsCollection is an API endpoint that gets a new collection of films from kinopoisk API.
+// @Tags Collections
+// @Summary New Collections
+// @Description this endpoint goes to kinopoisk API and gets a JSON data with new films
+// @Produce json
+// @Success 200 {object} jsonResponse "Successful registration"
+// @Router /collections/new-films [get]
+func (app *brokerHandler) GetNewFilmsCollection(w http.ResponseWriter, r *http.Request) {
 	var requestPayload requestPayload
 	err := helpers.ReadJSON(w, r, &requestPayload)
 	if err != nil {

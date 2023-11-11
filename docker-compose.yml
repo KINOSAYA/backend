@@ -31,6 +31,16 @@ services:
       dbURL: "postgres://postgres:password@postgres:5432/users?sslmode=disable"
       migrationPath: "file:///app"
 
+  external-api-service:
+    build:
+      context: ./external-api-service
+      dockerfile: ./external-api-service.dockerfile
+    restart: always
+    deploy:
+      mode: replicated
+      replicas: 1
+
+
   postgres:
     image: 'postgres:14.2-alpine'
     ports:

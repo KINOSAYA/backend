@@ -1,7 +1,6 @@
 package event
 
 import (
-	"encoding/json"
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
@@ -46,7 +45,7 @@ func (cons Consumer) Listen(topics []string) error {
 	go func() {
 		for d := range messages {
 			var payload Payload
-			_ = json.Unmarshal(d.Body, &payload)
+			payload.Name = string(d.Body)
 
 			go handlePayload(payload)
 		}

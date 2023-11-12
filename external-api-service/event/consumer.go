@@ -63,9 +63,40 @@ func handlePayload(payload Payload) {
 	case "new-films":
 		//TODO get from api some info
 		fmt.Println("successfully consumed info from rabbitMQ!!!!!!!!")
+	default:
+		fmt.Printf("payload.Name %s\n", payload.Name)
 	}
 }
 
-func NewEventConsumer(conn *amqp.Connection) Consumer {
-	return Consumer{conn: conn}
+func NewEventConsumer(conn *amqp.Connection) (Consumer, error) {
+	consumer := Consumer{
+		conn: conn,
+	}
+	err := consumer.setup()
+	if err != nil {
+		return Consumer{}, err
+	}
+
+	return consumer, err
+}
+
+func (consumer *Consumer) setup() error {
+	channel, err := consumer.conn.Channel()
+	if err != nil {
+		return err
+	}
+
+	return declareExchange(channel)
+}
+
+func declareExchange(ch *amqp.Channel) error {
+	return ch.ExchangeDeclare(
+		"logs",  // name
+		"topic", //type
+		true,    // durable
+		false,   // autoDelete
+		false,   // internal
+		false,   // no-wait
+		nil,     //arguments
+	)
 }

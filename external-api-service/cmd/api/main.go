@@ -18,10 +18,13 @@ func main() {
 
 	log.Println("Listening for and consuming RabbitMQ messages...")
 	// create consumer
-	consumer := event.NewEventConsumer(conn)
+	consumer, err := event.NewEventConsumer(conn)
+	if err != nil {
+		log.Fatal(err)
+	}
 	err = consumer.Listen([]string{"info"})
 	if err != nil {
-		log.Fatal("can't consume messages from queue")
+		log.Fatal("can't consume messages from queue", err)
 	}
 
 }

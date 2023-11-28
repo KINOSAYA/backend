@@ -2,6 +2,7 @@ package main
 
 import (
 	_ "broker-service/docs"
+	"broker-service/event"
 	"broker-service/internal/config"
 	"broker-service/internal/handlers"
 	"broker-service/internal/routes"
@@ -33,8 +34,10 @@ func main() {
 		os.Exit(1)
 	}
 	// Dependency Injection
-	app := config.Config{Rabbit: rabbitConn}
-	broker := handlers.NewBrokerHandler(authGrpcPort, authHost, app.Rabbit)
+	app := config.Config{
+		AmqpService: event.NewRabbitEventService(rabbitConn),
+	}
+	broker := handlers.NewBrokerHandler(authGrpcPort, authHost, app)
 	router := routes.NewChiRouter(broker, webPort)
 
 	log.Printf("Starting broker service on port %s\n", webPort)

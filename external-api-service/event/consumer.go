@@ -72,6 +72,7 @@ func handlePayload(payload Payload) {
 	case "new-films":
 		//TODO get from api some info
 		fmt.Println("successfully consumed info from rabbitMQ!!!!!!!!")
+		log.Println(os.Getenv("Bearer to TMDB"))
 		services.GetNewFilms(os.Getenv("Bearer to TMDB"), payload.Data.Language, payload.Data.TimeWindow)
 	default:
 		fmt.Printf("payload.Name %s\n", payload.Name)

@@ -1,7 +1,10 @@
 package config
 
-import amqp "github.com/rabbitmq/amqp091-go"
+import (
+	"broker-service/event"
+)
 
+// Config is a config with all services that this app uses
 type Config struct {
-	Rabbit *amqp.Connection
+	AmqpService event.Service
 }

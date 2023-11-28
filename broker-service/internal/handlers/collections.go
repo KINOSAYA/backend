@@ -32,11 +32,17 @@ func (app *brokerHandler) GetNewFilmsCollection(w http.ResponseWriter, r *http.R
 			TimeWindow: queryParams.Get("time-window"),
 		},
 	}
-	err := pushToQueue(app.Rabbit, payload)
+	//err := pushToQueue(app.Rabbit, payload)
+	//if err != nil {
+	//	_ = helpers.ErrorJSON(w, err)
+	//	return
+	//}
+	response, err := app.EventService.SendRequestAndWaitForResponse(payload)
 	if err != nil {
-		_ = helpers.ErrorJSON(w, err)
+		_ = helpers.ErrorJSON(w, err, http.StatusBadRequest)
 		return
 	}
+	_ = helpers.WriteJSON(w, http.StatusOK, response)
 
 	//TODO get response from external-api-service and write back
 }

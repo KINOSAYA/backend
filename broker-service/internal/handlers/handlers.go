@@ -2,7 +2,9 @@ package handlers
 
 import (
 	_ "broker-service/docs"
+	"broker-service/event"
 	"broker-service/internal/auth"
+	"broker-service/internal/config"
 	"broker-service/internal/helpers"
 	"context"
 	"errors"
@@ -12,8 +14,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
-	amqp "github.com/rabbitmq/amqp091-go"
 )
 
 type Handler interface {
@@ -25,18 +25,18 @@ type Handler interface {
 	GetNewFilmsCollection(w http.ResponseWriter, r *http.Request)
 }
 
-func NewBrokerHandler(authGrpcPort, authHost string, rabbit *amqp.Connection) Handler {
+func NewBrokerHandler(authGrpcPort, authHost string, app config.Config) Handler {
 	return &brokerHandler{
 		AuthGrpcPort: authGrpcPort,
 		AuthHost:     authHost,
-		Rabbit:       rabbit,
+		EventService: app.AmqpService,
 	}
 }
 
 type brokerHandler struct {
 	AuthGrpcPort string
 	AuthHost     string
-	Rabbit       *amqp.Connection
+	EventService event.Service
 }
 
 type jsonResponse struct {

@@ -1,9 +1,11 @@
 package event
 
 import (
+	"external-api-service/internal/services"
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
+	"os"
 )
 
 type Consumer struct {
@@ -12,6 +14,10 @@ type Consumer struct {
 
 type Payload struct {
 	Name string `json:"name"`
+	Data struct {
+		Language   string
+		TimeWindow string
+	} `json:"data,omitempty"`
 }
 
 func (cons Consumer) Listen(topics []string) error {
@@ -62,6 +68,8 @@ func handlePayload(payload Payload) {
 	case "new-films":
 		//TODO get from api some info
 		fmt.Println("successfully consumed info from rabbitMQ!!!!!!!!")
+
+		services.GetNewFilms(os.Getenv("Bearer to TMDB"), payload.Data.Language, payload.Data.TimeWindow)
 	default:
 		fmt.Printf("payload.Name %s\n", payload.Name)
 	}

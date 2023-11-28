@@ -15,8 +15,8 @@ type Consumer struct {
 type Payload struct {
 	Name string `json:"name"`
 	Data struct {
-		Language   string
-		TimeWindow string
+		Language   string `json:"language"`
+		TimeWindow string `json:"timeWindow"`
 	} `json:"data,omitempty"`
 }
 

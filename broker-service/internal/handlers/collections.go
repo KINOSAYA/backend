@@ -7,16 +7,32 @@ import (
 	"net/http"
 )
 
-// GetNewFilmsCollection is an API endpoint that gets a new collection of films from kinopoisk API.
+// GetNewFilmsCollection is an API endpoint that triggers the retrieval of a new collection of films from the TMDB API.
 // @Tags Collections
-// @Summary New Collections
-// @Description this endpoint goes to kinopoisk API and gets a JSON data with new films
+// @Summary Get New Films Collection
+// @Description This endpoint communicates with the TMDB API to fetch JSON data containing information about new films.
 // @Produce json
-// @Success 200 {object} jsonResponse "Successful registration"
+// @Param lan query string ru "Language code for the films (e.g., 'en' for English, 'ru' for Russian)"
+// @Param time-window query string day "Time window for the new films (e.g., 'day', 'week')"
+// @Success 200 {object} jsonResponse "Successful request"
 // @Router /collections/new-films [get]
 func (app *brokerHandler) GetNewFilmsCollection(w http.ResponseWriter, r *http.Request) {
 	//TODO push message to queue
-	err := pushToQueue("get-new-films", nil, app.Rabbit)
+	queryParams := r.URL.Query()
+	payload := struct {
+		Name string `json:"name"`
+		Data any
+	}{
+		Name: "new-films",
+		Data: struct {
+			Language   string `json:"language"`
+			TimeWindow string `json:"timeWindow"`
+		}{
+			Language:   queryParams.Get("lan"),
+			TimeWindow: queryParams.Get("time-window"),
+		},
+	}
+	err := pushToQueue(app.Rabbit, payload)
 	if err != nil {
 		_ = helpers.ErrorJSON(w, err)
 		return
@@ -25,10 +41,10 @@ func (app *brokerHandler) GetNewFilmsCollection(w http.ResponseWriter, r *http.R
 	//TODO get response from external-api-service and write back
 }
 
-func pushToQueue(name string, data any, conn *amqp.Connection) error {
+func pushToQueue(conn *amqp.Connection, payload any) error {
 	emitter := event.NewEventEmitter(conn)
 
-	err := emitter.Push(conn)
+	err := emitter.Push(conn, payload)
 	if err != nil {
 		return err
 	}

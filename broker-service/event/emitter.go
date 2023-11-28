@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"encoding/json"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
 	"time"
@@ -11,7 +12,7 @@ type Emitter struct {
 	connection *amqp.Connection
 }
 
-func (e Emitter) Push(conn *amqp.Connection) error {
+func (e Emitter) Push(conn *amqp.Connection, payload any) error {
 	c, err := conn.Channel()
 	if err != nil {
 		log.Fatalf("channel.open: %s", err)
@@ -22,7 +23,14 @@ func (e Emitter) Push(conn *amqp.Connection) error {
 		log.Fatalf("exchange.declare: %v", err)
 	}
 
-	msg := amqp.Publishing{DeliveryMode: amqp.Persistent, Timestamp: time.Now(), ContentType: "text/plain", Body: []byte("new-films")}
+	jsonBody, err := json.Marshal(payload)
+	msg := amqp.Publishing{
+		DeliveryMode: amqp.Persistent,
+		Timestamp:    time.Now(),
+		ContentType:  "application/json", // Change content type to "application/json"
+		Body:         jsonBody,
+	}
+
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 

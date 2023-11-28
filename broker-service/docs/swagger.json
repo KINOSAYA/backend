@@ -148,17 +148,31 @@
         },
         "/collections/new-films": {
             "get": {
-                "description": "this endpoint goes to kinopoisk API and gets a JSON data with new films",
+                "description": "This endpoint communicates with the TMDB API to fetch JSON data containing information about new films.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Collections"
                 ],
-                "summary": "New Collections",
+                "summary": "Get New Films Collection",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Language code for the films (e.g., 'en' for English, 'ru' for Russian)",
+                        "name": "lan",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Time window for the new films (e.g., 'day', 'week')",
+                        "name": "time-window",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
-                        "description": "Successful registration",
+                        "description": "Successful request",
                         "schema": {
                             "$ref": "#/definitions/handlers.jsonResponse"
                         }

@@ -39,6 +39,9 @@ services:
     deploy:
       mode: replicated
       replicas: 1
+    environment:
+      Bearer to TMDB: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZjQzNDM3YzUxYWZjZjIzOTllNGJhN2FlZDAxNDNkZSIsInN1YiI6IjY1NWYzNjQwNzA2ZTU2MDBlMTUxYjNkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.IVhcwx0YwpKHlwhe0u9ppa9PE-Z0b5wQW2gohNP0n1Q
+
 
 
   postgres:

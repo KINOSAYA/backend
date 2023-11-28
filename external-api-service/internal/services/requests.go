@@ -14,7 +14,7 @@ func GetNewFilms(bearer, language, timeWindow string) {
 		return
 	}
 
-	req.Header.Set("Authorization", fmt.Sprintf("bearer %s", bearer))
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", bearer))
 	req.Header.Set("accept", "application/json")
 
 	client := &http.Client{}

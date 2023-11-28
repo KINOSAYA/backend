@@ -1,6 +1,7 @@
 package event
 
 import (
+	"encoding/json"
 	"external-api-service/internal/services"
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
@@ -51,8 +52,11 @@ func (cons Consumer) Listen(topics []string) error {
 	go func() {
 		for d := range messages {
 			var payload Payload
-			payload.Name = string(d.Body)
-
+			err := json.Unmarshal(d.Body, &payload)
+			if err != nil {
+				log.Println("consumer:57 ", err)
+				continue
+			}
 			go handlePayload(payload)
 		}
 	}()
@@ -68,7 +72,6 @@ func handlePayload(payload Payload) {
 	case "new-films":
 		//TODO get from api some info
 		fmt.Println("successfully consumed info from rabbitMQ!!!!!!!!")
-
 		services.GetNewFilms(os.Getenv("Bearer to TMDB"), payload.Data.Language, payload.Data.TimeWindow)
 	default:
 		fmt.Printf("payload.Name %s\n", payload.Name)

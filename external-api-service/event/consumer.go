@@ -57,7 +57,7 @@ func (cons Consumer) Listen(topics []string) error {
 				log.Println("consumer:57 ", err)
 				continue
 			}
-			go handlePayload(payload)
+			go handlePayload(payload, c, d)
 		}
 	}()
 
@@ -67,13 +67,33 @@ func (cons Consumer) Listen(topics []string) error {
 	return nil
 }
 
-func handlePayload(payload Payload) {
+func handlePayload(payload Payload, ch *amqp.Channel, delivery amqp.Delivery) {
 	switch payload.Name {
 	case "new-films":
 		//TODO get from api some info
 		fmt.Println("successfully consumed info from rabbitMQ!!!!!!!!")
 		log.Println(os.Getenv("Bearer to TMDB"))
-		services.GetNewFilms(os.Getenv("Bearer to TMDB"), payload.Data.Language, payload.Data.TimeWindow)
+		responseMessage, err := services.GetNewFilms(os.Getenv("Bearer to TMDB"), payload.Data.Language, payload.Data.TimeWindow)
+		if err != nil {
+
+		}
+		log.Println("Sending message back")
+		//emitter := NewEventEmitter(conn)
+		//emitter.Push("hit the ext-api service!")
+
+		// Отправляем ответ в ту же очередь, откуда пришел запрос
+		err = ch.Publish(
+			"",               // Обменник (пусто для обмена по умолчанию)
+			delivery.ReplyTo, // Ответная очередь
+			false,            // Опубликованное сообщение не сохраняется в хранилище
+			false,            // Не устанавливать подтверждение доставки
+			amqp.Publishing{
+				ContentType: "text/plain",
+				Body:        responseMessage,
+			})
+		if err != nil {
+			log.Printf("cannot respond back %v\n", err)
+		}
 	default:
 		fmt.Printf("payload.Name %s\n", payload.Name)
 	}

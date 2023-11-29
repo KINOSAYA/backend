@@ -6,12 +6,12 @@ import (
 	"net/http"
 )
 
-func GetNewFilms(bearer, language, timeWindow string) {
+func GetNewFilms(bearer, language, timeWindow string) ([]byte, error) {
 	var url = fmt.Sprintf("https://api.themoviedb.org/3/trending/movie/%s?language=%s", timeWindow, language)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		fmt.Println("Error creating request:", err)
-		return
+		return nil, err
 	}
 
 	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", bearer))
@@ -21,15 +21,16 @@ func GetNewFilms(bearer, language, timeWindow string) {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Error making request:", err)
-		return
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Error reading response body:", err)
-		return
+		return nil, err
 	}
 
 	fmt.Println(string(body))
+	return body, nil
 }

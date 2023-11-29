@@ -79,7 +79,6 @@ func (rabbit RabbitEventService) SendRequestAndWaitForResponse(payload any) (any
 		return nil, fmt.Errorf("basic.publish: %w", err)
 	}
 
-	log.Println("successfully sent to queue")
 	// Получение ответа из временной очереди
 	messages, err := c.Consume(
 		responseQueue.Name,

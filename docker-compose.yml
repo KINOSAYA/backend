@@ -40,7 +40,7 @@ services:
       mode: replicated
       replicas: 1
     environment:
-      Bearer to TMDB: eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIyZjQzNDM3YzUxYWZjZjIzOTllNGJhN2FlZDAxNDNkZSIsInN1YiI6IjY1NWYzNjQwNzA2ZTU2MDBlMTUxYjNkYiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.IVhcwx0YwpKHlwhe0u9ppa9PE-Z0b5wQW2gohNP0n1Q
+      apiKey: J5H7K5C-KQM4V8T-PF4PGM0-GR2VMZS
 
 
 

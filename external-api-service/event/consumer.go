@@ -88,7 +88,7 @@ func handlePayload(payload Payload, ch *amqp.Channel, delivery amqp.Delivery) {
 			false,            // Опубликованное сообщение не сохраняется в хранилище
 			false,            // Не устанавливать подтверждение доставки
 			amqp.Publishing{
-				ContentType: "text/plain",
+				ContentType: "application/json",
 				Body:        responseMessage,
 			})
 		if err != nil {

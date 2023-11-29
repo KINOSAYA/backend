@@ -22,7 +22,7 @@ func declareExchange(ch *amqp.Channel) error {
 }
 
 type Service interface {
-	SendRequestAndWaitForResponse(payload any) (any, error)
+	SendRequestAndWaitForResponse(payload any) ([]byte, error)
 }
 type RabbitEventService struct {
 	conn *amqp.Connection
@@ -34,7 +34,7 @@ func NewRabbitEventService(connection *amqp.Connection) Service {
 	}
 }
 
-func (rabbit RabbitEventService) SendRequestAndWaitForResponse(payload any) (any, error) {
+func (rabbit RabbitEventService) SendRequestAndWaitForResponse(payload any) ([]byte, error) {
 	c, err := rabbit.conn.Channel()
 	if err != nil {
 		log.Fatalf("channel.open: %s", err)
@@ -95,6 +95,7 @@ func (rabbit RabbitEventService) SendRequestAndWaitForResponse(payload any) (any
 
 	// Ожидание и обработка ответа
 	for d := range messages {
+		log.Println(string(d.Body))
 		return d.Body, nil
 	}
 

@@ -37,12 +37,19 @@ func (app *brokerHandler) GetNewFilmsCollection(w http.ResponseWriter, r *http.R
 	//	_ = helpers.ErrorJSON(w, err)
 	//	return
 	//}
+
 	response, err := app.EventService.SendRequestAndWaitForResponse(payload)
 	if err != nil {
 		_ = helpers.ErrorJSON(w, err, http.StatusBadRequest)
 		return
 	}
-	_ = helpers.WriteJSON(w, http.StatusOK, response)
+
+	w.Header().Set("Content-Type", "application/json")
+	_, err = w.Write(response)
+	if err != nil {
+		_ = helpers.ErrorJSON(w, err, http.StatusBadRequest)
+	}
+	//_ = helpers.WriteJSON(w, http.StatusOK, rsp)
 
 	//TODO get response from external-api-service and write back
 }

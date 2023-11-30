@@ -6,7 +6,6 @@ import (
 	"fmt"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"log"
-	"os"
 )
 
 type Consumer struct {
@@ -16,8 +15,9 @@ type Consumer struct {
 type Payload struct {
 	Name string `json:"name"`
 	Data struct {
-		Language   string `json:"language"`
-		TimeWindow string `json:"timeWindow"`
+		Page     int    `json:"page"`
+		Limit    int    `json:"limit"`
+		Category string `json:"category"`
 	} `json:"data,omitempty"`
 }
 
@@ -70,12 +70,23 @@ func (cons Consumer) Listen(topics []string) error {
 func handlePayload(payload Payload, ch *amqp.Channel, delivery amqp.Delivery) {
 	switch payload.Name {
 	case "new-films":
-		//TODO get from api some info
 		fmt.Println("successfully consumed info from rabbitMQ!!!!!!!!")
-		log.Println(os.Getenv("Bearer to TMDB"))
-		responseMessage, err := services.GetNewFilms(os.Getenv("Bearer to TMDB"), payload.Data.Language, payload.Data.TimeWindow)
-		if err != nil {
+		responseMessage, err := services.GetNewFilms(payload.Data.Page, payload.Data.Limit, payload.Data.Category)
+		fmt.Println(string(responseMessage))
 
+		if err != nil {
+			err = ch.Publish(
+				"",               // Обменник (пусто для обмена по умолчанию)
+				delivery.ReplyTo, // Ответная очередь
+				false,            // Опубликованное сообщение не сохраняется в хранилище
+				false,            // Не устанавливать подтверждение доставки
+				amqp.Publishing{
+					ContentType: "text/plain",
+					Body:        []byte(err.Error()),
+				})
+			if err != nil {
+				log.Printf("cannot respond back %v\n", err)
+			}
 		}
 		log.Println("Sending message back")
 		//emitter := NewEventEmitter(conn)

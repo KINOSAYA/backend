@@ -155,25 +155,31 @@ const docTemplate = `{
         },
         "/collections/new-films": {
             "get": {
-                "description": "This endpoint communicates with the TMDB API to fetch JSON data containing information about new films.",
+                "description": "This endpoint communicates with the Kinopoisk API to fetch JSON data containing information about new films.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Collections"
                 ],
-                "summary": "Get New Films Collection",
+                "summary": "Get Collection",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "Language code for the films (e.g., 'en' for English, 'ru' for Russian)",
-                        "name": "lan",
+                        "description": "Page of results",
+                        "name": "page",
                         "in": "query"
                     },
                     {
                         "type": "string",
-                        "description": "Time window for the new films (e.g., 'day', 'week')",
-                        "name": "time-window",
+                        "description": "Limit records for one page",
+                        "name": "limit",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Category e.g. ('Фильмы', 'Сериалы')",
+                        "name": "category",
                         "in": "query"
                     }
                 ],

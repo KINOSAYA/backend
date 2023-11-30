@@ -5,31 +5,37 @@ import (
 	"broker-service/internal/helpers"
 	amqp "github.com/rabbitmq/amqp091-go"
 	"net/http"
+	"strconv"
 )
 
-// GetNewFilmsCollection is an API endpoint that triggers the retrieval of a new collection of films from the TMDB API.
+// GetCollections is an API endpoint that triggers the retrieval of a new collection of films from the Kinopoisk API.
 // @Tags Collections
-// @Summary Get New Films Collection
-// @Description This endpoint communicates with the TMDB API to fetch JSON data containing information about new films.
+// @Summary Get Collection
+// @Description This endpoint communicates with the Kinopoisk API to fetch JSON data containing information about new films.
 // @Produce json
-// @Param lan query string ru "Language code for the films (e.g., 'en' for English, 'ru' for Russian)"
-// @Param time-window query string day "Time window for the new films (e.g., 'day', 'week')"
+// @Param page query string day "Page of results"
+// @Param limit query string day "Limit records for one page"
+// @Param category query string day "Category e.g. ('Фильмы', 'Сериалы')"
 // @Success 200 {object} jsonResponse "Successful request"
 // @Router /collections/new-films [get]
-func (app *brokerHandler) GetNewFilmsCollection(w http.ResponseWriter, r *http.Request) {
+func (app *brokerHandler) GetCollections(w http.ResponseWriter, r *http.Request) {
 	//TODO push message to queue
 	queryParams := r.URL.Query()
+	page, _ := strconv.Atoi(queryParams.Get("page"))
+	limit, _ := strconv.Atoi(queryParams.Get("limit"))
 	payload := struct {
 		Name string `json:"name"`
 		Data any
 	}{
 		Name: "new-films",
 		Data: struct {
-			Language   string `json:"language"`
-			TimeWindow string `json:"timeWindow"`
+			Page     int    `json:"page"`
+			Limit    int    `json:"limit"`
+			Category string `json:"category"`
 		}{
-			Language:   queryParams.Get("lan"),
-			TimeWindow: queryParams.Get("time-window"),
+			Page:     page,
+			Limit:    limit,
+			Category: queryParams.Get("category"),
 		},
 	}
 	//err := pushToQueue(app.Rabbit, payload)

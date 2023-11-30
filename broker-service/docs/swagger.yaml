@@ -120,17 +120,20 @@ paths:
       - Auth
   /collections/new-films:
     get:
-      description: This endpoint communicates with the TMDB API to fetch JSON data
-        containing information about new films.
+      description: This endpoint communicates with the Kinopoisk API to fetch JSON
+        data containing information about new films.
       parameters:
-      - description: Language code for the films (e.g., 'en' for English, 'ru' for
-          Russian)
+      - description: Page of results
         in: query
-        name: lan
+        name: page
         type: string
-      - description: Time window for the new films (e.g., 'day', 'week')
+      - description: Limit records for one page
         in: query
-        name: time-window
+        name: limit
+        type: string
+      - description: Category e.g. ('Фильмы', 'Сериалы')
+        in: query
+        name: category
         type: string
       produces:
       - application/json
@@ -139,7 +142,7 @@ paths:
           description: Successful request
           schema:
             $ref: '#/definitions/handlers.jsonResponse'
-      summary: Get New Films Collection
+      summary: Get Collection
       tags:
       - Collections
 swagger: "2.0"

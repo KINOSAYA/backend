@@ -22,7 +22,7 @@ type Handler interface {
 	AuthLoginUser(w http.ResponseWriter, r *http.Request)
 	ParseToken(w http.ResponseWriter, r *http.Request)
 
-	GetNewFilmsCollection(w http.ResponseWriter, r *http.Request)
+	GetCollections(w http.ResponseWriter, r *http.Request)
 }
 
 func NewBrokerHandler(authGrpcPort, authHost string, app config.Config) Handler {

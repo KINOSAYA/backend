@@ -21,6 +21,7 @@ type Handler interface {
 	AuthUser(w http.ResponseWriter, r *http.Request)
 	AuthLoginUser(w http.ResponseWriter, r *http.Request)
 	ParseToken(w http.ResponseWriter, r *http.Request)
+	Refresh(w http.ResponseWriter, r *http.Request)
 
 	GetCollections(w http.ResponseWriter, r *http.Request)
 }
@@ -227,4 +228,59 @@ func (app *brokerHandler) ParseToken(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = helpers.WriteJSON(w, http.StatusAccepted, payload)
+}
+
+type token struct {
+	Token string `json:"token"`
+}
+
+// Refresh is a handler that provides access token update
+// @Tags Auth
+// @Summary Refresh Access Token
+// @Description Refreshes an access token using a refresh token.
+// @ID refreshAccessToken
+// @Accept json
+// @Produce json
+// @Param requestBody body token true "Refresh token structure"
+// @Success 202 {object} jsonResponse "Token refresh successful"
+// @Failure 400 {object} jsonResponse "Bad request"
+// @Failure 401 {object} jsonResponse "Unauthorized"
+// @Router /auth/refresh [post]
+func (app *brokerHandler) Refresh(w http.ResponseWriter, r *http.Request) {
+
+	requestPayload := token{}
+	err := helpers.ReadJSON(w, r, &requestPayload)
+	if err != nil {
+		_ = helpers.ErrorJSON(w, err)
+		return
+	}
+
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", app.AuthHost, app.AuthGrpcPort), grpc.WithTransportCredentials(insecure.NewCredentials()), grpc.WithBlock())
+	if err != nil {
+		return
+	}
+	defer conn.Close()
+
+	c := auth.NewAuthServiceClient(conn)
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+
+	tokenResponse, err := c.Refresh(ctx, &auth.TokenRequest{
+		TokenString: requestPayload.Token,
+	})
+	if err != nil {
+		_ = helpers.ErrorJSON(w, err, http.StatusUnauthorized)
+		return
+	}
+
+	payload := jsonResponse{
+		Error:   false,
+		Message: "updated access Token",
+		Data: token{
+			Token: tokenResponse.TokenString,
+		},
+	}
+
+	_ = helpers.WriteJSON(w, http.StatusAccepted, payload)
+
 }

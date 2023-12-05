@@ -34,15 +34,16 @@ func (a AuthServer) RegisterUser(ctx context.Context, req *auth.UserRequest) (*a
 	}
 
 	// return a response
-	token, err := a.Service.GenerateToken(id, user.Username)
+	accessToken, refreshToken, err := a.Service.GenerateToken(id)
 	if err != nil {
 		return nil, err
 	}
 	res := &auth.UserResponse{
 		Message: "Inserted user!",
 		Data: &auth.ResponseData{
-			ID:    uint64(id),
-			Token: token,
+			ID:           uint64(id),
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
 		},
 	}
 	return res, nil
@@ -77,20 +78,21 @@ func (a AuthServer) AuthUser(ctx context.Context, req *auth.UserRequest) (*auth.
 		Password: input.Password,
 	}
 
-	id, username, err := app.DB.Authenticate(user.Email, user.Username, user.Password)
+	id, _, err := app.DB.Authenticate(user.Email, user.Username, user.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	generatedToken, err := a.Service.GenerateToken(id, username)
+	access, refresh, err := a.Service.GenerateToken(id)
 	if err != nil {
 		return nil, err
 	}
 	res := &auth.UserResponse{
 		Message: "Successfully authenticated!",
 		Data: &auth.ResponseData{
-			ID:    uint64(id),
-			Token: generatedToken,
+			ID:           uint64(id),
+			AccessToken:  access,
+			RefreshToken: refresh,
 		},
 	}
 	return res, nil
@@ -98,15 +100,31 @@ func (a AuthServer) AuthUser(ctx context.Context, req *auth.UserRequest) (*auth.
 
 func (a AuthServer) CheckToken(ctx context.Context, req *auth.TokenRequest) (*auth.TokenResponse, error) {
 	tokenString := req.GetTokenString()
-	id, username, err := a.Service.ParseToken(tokenString)
+	id, err := a.Service.ParseToken(tokenString, false)
 	if err != nil {
 		return nil, err
 	}
 
 	res := &auth.TokenResponse{
-		Id:       uint64(id),
-		Username: username,
+		Id:    uint64(id),
+		Token: tokenString,
 	}
 
+	return res, nil
+}
+
+func (a AuthServer) Refresh(ctx context.Context, req *auth.TokenRequest) (*auth.TokenRequest, error) {
+	tokenString := req.GetTokenString()
+
+	id, err := a.Service.ParseToken(tokenString, true)
+	if err != nil {
+		return nil, err
+	}
+
+	token, _, err := a.Service.GenerateToken(id)
+	if err != nil {
+		return nil, err
+	}
+	res := &auth.TokenRequest{TokenString: token}
 	return res, nil
 }

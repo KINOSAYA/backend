@@ -16,7 +16,8 @@ message UserRequest {
 
 message ResponseData {
   uint64 ID = 1;
-  string token = 2;
+  string accessToken = 2;
+  string refreshToken = 3;
 }
 
 message UserResponse {
@@ -30,12 +31,13 @@ message TokenRequest {
 
 
 message TokenResponse {
-  uint64 id = 1;
-  string username = 2;
+  bool valid = 1;
+  string message = 2;
 }
 
 service AuthService {
   rpc RegisterUser(UserRequest) returns (UserResponse);
   rpc AuthUser(UserRequest) returns (UserResponse);
   rpc CheckToken(TokenRequest) returns (TokenResponse);
+  rpc Refresh(TokenRequest) returns (TokenRequest);
 }

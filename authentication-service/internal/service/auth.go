@@ -16,8 +16,8 @@ const (
 )
 
 type AuthorizationService interface {
-	GenerateToken(id int, username string) (string, string, error)
-	ParseToken(tokenString string) (int, string, error)
+	GenerateToken(id int) (string, string, error)
+	ParseToken(tokenString string) (int, error)
 }
 
 type AuthService struct {
@@ -32,11 +32,10 @@ type authClaims struct {
 	jwt.RegisteredClaims
 }
 
-func (a AuthService) GenerateToken(id int, username string) (string, string, error) {
+func (a AuthService) GenerateToken(id int) (string, string, error) {
 
 	claims := authClaims{
 		ID:        id,
-		Username:  username,
 		IssuedAt:  time.Now().Unix(),
 		ExpiresAt: time.Now().Add(accessTokenDuration).Unix(),
 	}
@@ -51,7 +50,6 @@ func (a AuthService) GenerateToken(id int, username string) (string, string, err
 	// Generate refresh token
 	refreshTokenClaims := authClaims{
 		ID:        id,
-		Username:  username,
 		IssuedAt:  time.Now().Unix(),
 		ExpiresAt: time.Now().Add(refreshTokenDuration).Unix(),
 	}
@@ -66,25 +64,25 @@ func (a AuthService) GenerateToken(id int, username string) (string, string, err
 	return accessTokenString, refreshTokenString, nil
 }
 
-func (a AuthService) ParseToken(tokenString string) (int, string, error) {
+func (a AuthService) ParseToken(tokenString string) (int, error) {
 
 	token, err := jwt.ParseWithClaims(tokenString, &authClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(hmacSampleSecret), nil
 	})
 	if err != nil {
 		log.Printf("error parsing tokenString, %v\n", err)
-		return 0, "", err
+		return 0, err
 	}
 
 	if claims, ok := token.Claims.(*authClaims); ok && token.Valid {
 		fmt.Printf("%v %v %v", claims.ID, claims.Username, claims.ExpiresAt)
 		if claims.ExpiresAt < time.Now().Unix() {
-			return 0, "", errors.New("token expired")
+			return 0, errors.New("token expired")
 		}
-		return claims.ID, claims.Username, nil
+		return claims.ID, nil
 	} else {
 		fmt.Printf("error in casting to authClaims, %v\n", err)
-		return 0, "", err
+		return 0, err
 	}
 }
 

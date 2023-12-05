@@ -231,7 +231,7 @@ func (app *brokerHandler) ParseToken(w http.ResponseWriter, r *http.Request) {
 }
 
 type token struct {
-	Token string `json:"refreshToken"`
+	Token string `json:"token"`
 }
 
 // Refresh is a handler that provides access token update

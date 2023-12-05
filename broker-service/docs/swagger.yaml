@@ -24,7 +24,7 @@ definitions:
     type: object
   handlers.token:
     properties:
-      refreshToken:
+      token:
         type: string
     type: object
 host: localhost:8080

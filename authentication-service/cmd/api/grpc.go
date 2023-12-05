@@ -100,7 +100,7 @@ func (a AuthServer) AuthUser(ctx context.Context, req *auth.UserRequest) (*auth.
 
 func (a AuthServer) CheckToken(ctx context.Context, req *auth.TokenRequest) (*auth.TokenResponse, error) {
 	tokenString := req.GetTokenString()
-	id, err := a.Service.ParseToken(tokenString)
+	id, err := a.Service.ParseToken(tokenString, false)
 	if err != nil {
 		return nil, err
 	}
@@ -116,7 +116,7 @@ func (a AuthServer) CheckToken(ctx context.Context, req *auth.TokenRequest) (*au
 func (a AuthServer) Refresh(ctx context.Context, req *auth.TokenRequest) (*auth.TokenRequest, error) {
 	tokenString := req.GetTokenString()
 
-	id, err := a.Service.ParseToken(tokenString)
+	id, err := a.Service.ParseToken(tokenString, true)
 	if err != nil {
 		return nil, err
 	}

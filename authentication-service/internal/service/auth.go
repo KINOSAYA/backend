@@ -17,7 +17,7 @@ const (
 
 type AuthorizationService interface {
 	GenerateToken(id int) (string, string, error)
-	ParseToken(tokenString string) (int, error)
+	ParseToken(tokenString string, isRefresh bool) (int, error)
 }
 
 type AuthService struct {
@@ -25,10 +25,10 @@ type AuthService struct {
 }
 
 type authClaims struct {
-	ID        int    `json:"id"`
-	Username  string `json:"username"`
-	IssuedAt  int64  `json:"issuedAt"`
-	ExpiresAt int64  `json:"expiresAt"`
+	ID        int   `json:"id"`
+	IsRefresh bool  `json:"is-refresh"`
+	IssuedAt  int64 `json:"issuedAt"`
+	ExpiresAt int64 `json:"expiresAt"`
 	jwt.RegisteredClaims
 }
 
@@ -37,6 +37,7 @@ func (a AuthService) GenerateToken(id int) (string, string, error) {
 	claims := authClaims{
 		ID:        id,
 		IssuedAt:  time.Now().Unix(),
+		IsRefresh: false,
 		ExpiresAt: time.Now().Add(accessTokenDuration).Unix(),
 	}
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
@@ -51,6 +52,7 @@ func (a AuthService) GenerateToken(id int) (string, string, error) {
 	refreshTokenClaims := authClaims{
 		ID:        id,
 		IssuedAt:  time.Now().Unix(),
+		IsRefresh: true,
 		ExpiresAt: time.Now().Add(refreshTokenDuration).Unix(),
 	}
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, refreshTokenClaims)
@@ -64,7 +66,7 @@ func (a AuthService) GenerateToken(id int) (string, string, error) {
 	return accessTokenString, refreshTokenString, nil
 }
 
-func (a AuthService) ParseToken(tokenString string) (int, error) {
+func (a AuthService) ParseToken(tokenString string, isRefresh bool) (int, error) {
 
 	token, err := jwt.ParseWithClaims(tokenString, &authClaims{}, func(token *jwt.Token) (interface{}, error) {
 		return []byte(hmacSampleSecret), nil
@@ -75,11 +77,14 @@ func (a AuthService) ParseToken(tokenString string) (int, error) {
 	}
 
 	if claims, ok := token.Claims.(*authClaims); ok && token.Valid {
-		fmt.Printf("%v %v %v", claims.ID, claims.Username, claims.ExpiresAt)
+		fmt.Printf("%v %v %v", claims.ID, claims.IsRefresh, claims.ExpiresAt)
 		if claims.ExpiresAt < time.Now().Unix() {
 			return 0, errors.New("token expired")
 		}
-		return claims.ID, nil
+		if claims.IsRefresh == isRefresh {
+			return claims.ID, nil
+		}
+		return 0, errors.New("token is not refresh")
 	} else {
 		fmt.Printf("error in casting to authClaims, %v\n", err)
 		return 0, err

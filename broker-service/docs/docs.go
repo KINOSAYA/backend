@@ -279,7 +279,7 @@ const docTemplate = `{
         "handlers.token": {
             "type": "object",
             "properties": {
-                "refreshToken": {
+                "token": {
                     "type": "string"
                 }
             }

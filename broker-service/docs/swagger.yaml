@@ -22,6 +22,11 @@ definitions:
       token:
         type: string
     type: object
+  handlers.token:
+    properties:
+      refreshToken:
+        type: string
+    type: object
 host: localhost:8080
 info:
   contact: {}
@@ -90,6 +95,37 @@ paths:
           schema:
             $ref: '#/definitions/handlers.jsonResponse'
       summary: token parser
+      tags:
+      - Auth
+  /auth/refresh:
+    post:
+      consumes:
+      - application/json
+      description: Refreshes an access token using a refresh token.
+      operationId: refreshAccessToken
+      parameters:
+      - description: Refresh token structure
+        in: body
+        name: requestBody
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.token'
+      produces:
+      - application/json
+      responses:
+        "202":
+          description: Token refresh successful
+          schema:
+            $ref: '#/definitions/handlers.jsonResponse'
+        "400":
+          description: Bad request
+          schema:
+            $ref: '#/definitions/handlers.jsonResponse'
+        "401":
+          description: Unauthorized
+          schema:
+            $ref: '#/definitions/handlers.jsonResponse'
+      summary: Refresh Access Token
       tags:
       - Auth
   /auth/registration:

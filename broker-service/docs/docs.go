@@ -113,6 +113,53 @@ const docTemplate = `{
                 }
             }
         },
+        "/auth/refresh": {
+            "post": {
+                "description": "Refreshes an access token using a refresh token.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Refresh Access Token",
+                "operationId": "refreshAccessToken",
+                "parameters": [
+                    {
+                        "description": "Refresh token structure",
+                        "name": "requestBody",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/handlers.token"
+                        }
+                    }
+                ],
+                "responses": {
+                    "202": {
+                        "description": "Token refresh successful",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.jsonResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.jsonResponse"
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "schema": {
+                            "$ref": "#/definitions/handlers.jsonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/auth/registration": {
             "post": {
                 "description": "Registers a new user with the specified data.",
@@ -225,6 +272,14 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "token": {
+                    "type": "string"
+                }
+            }
+        },
+        "handlers.token": {
+            "type": "object",
+            "properties": {
+                "refreshToken": {
                     "type": "string"
                 }
             }

@@ -49,7 +49,9 @@ func (chiRouter *ChiRouters) GetRoutes() http.Handler {
 	mux.Route("/auth", func(mux chi.Router) {
 		mux.Post("/registration", chiRouter.Handler.AuthUser)
 		mux.Post("/login", chiRouter.Handler.AuthLoginUser)
-		mux.Post("/parse-token", chiRouter.Handler.ParseToken)
+
+		mux.Post("/parse-token", chiRouter.Handler.ParseToken) // it will be commented
+		mux.Post("/refresh", chiRouter.Handler.Refresh)
 	})
 
 	mux.Route("/collections", func(mux chi.Router) {

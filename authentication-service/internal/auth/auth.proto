@@ -16,7 +16,8 @@ message UserRequest {
 
 message ResponseData {
   uint64 ID = 1;
-  string token = 2;
+  string accessToken = 2;
+  string refreshToken = 3;
 }
 
 message UserResponse {

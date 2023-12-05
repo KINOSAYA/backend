@@ -34,15 +34,16 @@ func (a AuthServer) RegisterUser(ctx context.Context, req *auth.UserRequest) (*a
 	}
 
 	// return a response
-	token, err := a.Service.GenerateToken(id, user.Username)
+	accessToken, refreshToken, err := a.Service.GenerateToken(id, user.Username)
 	if err != nil {
 		return nil, err
 	}
 	res := &auth.UserResponse{
 		Message: "Inserted user!",
 		Data: &auth.ResponseData{
-			ID:    uint64(id),
-			Token: token,
+			ID:           uint64(id),
+			AccessToken:  accessToken,
+			RefreshToken: refreshToken,
 		},
 	}
 	return res, nil
@@ -82,15 +83,16 @@ func (a AuthServer) AuthUser(ctx context.Context, req *auth.UserRequest) (*auth.
 		return nil, err
 	}
 
-	generatedToken, err := a.Service.GenerateToken(id, username)
+	access, refresh, err := a.Service.GenerateToken(id, username)
 	if err != nil {
 		return nil, err
 	}
 	res := &auth.UserResponse{
 		Message: "Successfully authenticated!",
 		Data: &auth.ResponseData{
-			ID:    uint64(id),
-			Token: generatedToken,
+			ID:           uint64(id),
+			AccessToken:  access,
+			RefreshToken: refresh,
 		},
 	}
 	return res, nil

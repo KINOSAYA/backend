@@ -49,11 +49,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "User data",
-                        "name": "requestPayload",
+                        "name": "registrationPayload",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.requestPayload"
+                            "$ref": "#/definitions/handlers.registrationPayload"
                         }
                     }
                 ],
@@ -89,7 +89,7 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "User data",
-                        "name": "requestPayload",
+                        "name": "registrationPayload",
                         "in": "body",
                         "required": true,
                         "schema": {
@@ -176,11 +176,11 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "description": "User data",
-                        "name": "requestPayload",
+                        "name": "registrationPayload",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.requestPayload"
+                            "$ref": "#/definitions/handlers.registrationPayload"
                         }
                     }
                 ],
@@ -200,14 +200,61 @@ const docTemplate = `{
                 }
             }
         },
-        "/collections/new-films": {
+        "/kinopoisk/films": {
             "get": {
-                "description": "This endpoint communicates with the Kinopoisk API to fetch JSON data containing information about new films.",
+                "description": "Retrieve films based on the provided slug.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Collections"
+                    "Kinopoisk"
+                ],
+                "summary": "Get Films by Slug",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "The slug of the film",
+                        "name": "slug",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Page number for pagination",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Number of items per page",
+                        "name": "limit",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful response",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/kinopoisk/slugs": {
+            "get": {
+                "description": "This endpoint communicates with the Kinopoisk API to fetch JSON data containing information about slugs by chosen category.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Kinopoisk"
                 ],
                 "summary": "Get Collection",
                 "parameters": [
@@ -254,7 +301,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.requestPayload": {
+        "handlers.registrationPayload": {
             "type": "object",
             "properties": {
                 "email": {

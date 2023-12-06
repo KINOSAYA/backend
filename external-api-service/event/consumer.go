@@ -13,12 +13,17 @@ type Consumer struct {
 }
 
 type Payload struct {
-	Name string `json:"name"`
-	Data struct {
-		Page     int    `json:"page"`
-		Limit    int    `json:"limit"`
-		Category string `json:"category"`
+	Name       string     `json:"name"`
+	Pagination Pagination `json:"pagination"`
+	Data       struct {
+		Category string `json:"category,omitempty"`
+		Slug     string `json:"slug,omitempty"`
 	} `json:"data,omitempty"`
+}
+
+type Pagination struct {
+	Page  int `json:"page"`
+	Limit int `json:"limit"`
 }
 
 func (cons Consumer) Listen(topics []string) error {
@@ -67,44 +72,56 @@ func (cons Consumer) Listen(topics []string) error {
 	return nil
 }
 
+func sendMsgBack(payload []byte, ch *amqp.Channel, delivery amqp.Delivery) {
+	err := ch.Publish(
+		"",               // Обменник (пусто для обмена по умолчанию)
+		delivery.ReplyTo, // Ответная очередь
+		false,            // Опубликованное сообщение не сохраняется в хранилище
+		false,            // Не устанавливать подтверждение доставки
+		amqp.Publishing{
+			ContentType: "application/json",
+			Body:        payload,
+		})
+	if err != nil {
+		log.Printf("cannot respond back %v\n", err)
+	}
+}
+
+type ErrorJson struct {
+	Error string `json:"error"`
+}
+
+func sendErrorBack(err error, ch *amqp.Channel, delivery amqp.Delivery) {
+	res := ErrorJson{
+		Error: err.Error(),
+	}
+	jsonRes, _ := json.Marshal(res)
+	sendMsgBack(jsonRes, ch, delivery)
+}
 func handlePayload(payload Payload, ch *amqp.Channel, delivery amqp.Delivery) {
 	switch payload.Name {
-	case "new-films":
-		fmt.Println("successfully consumed info from rabbitMQ!!!!!!!!")
-		responseMessage, err := services.GetNewFilms(payload.Data.Page, payload.Data.Limit, payload.Data.Category)
-		fmt.Println(string(responseMessage))
+	case "get-slugs":
+		responseMessage, err := services.GetSlugsByCategory(payload.Pagination.Page, payload.Pagination.Limit, payload.Data.Category)
 
 		if err != nil {
-			err = ch.Publish(
-				"",               // Обменник (пусто для обмена по умолчанию)
-				delivery.ReplyTo, // Ответная очередь
-				false,            // Опубликованное сообщение не сохраняется в хранилище
-				false,            // Не устанавливать подтверждение доставки
-				amqp.Publishing{
-					ContentType: "text/plain",
-					Body:        []byte(err.Error()),
-				})
-			if err != nil {
-				log.Printf("cannot respond back %v\n", err)
-			}
+			sendErrorBack(err, ch, delivery)
+			return
 		}
-		log.Println("Sending message back")
-		//emitter := NewEventEmitter(conn)
-		//emitter.Push("hit the ext-api service!")
 
 		// Отправляем ответ в ту же очередь, откуда пришел запрос
-		err = ch.Publish(
-			"",               // Обменник (пусто для обмена по умолчанию)
-			delivery.ReplyTo, // Ответная очередь
-			false,            // Опубликованное сообщение не сохраняется в хранилище
-			false,            // Не устанавливать подтверждение доставки
-			amqp.Publishing{
-				ContentType: "application/json",
-				Body:        responseMessage,
-			})
+		sendMsgBack(responseMessage, ch, delivery)
+
+	case "get-films":
+		log.Println("got request for get-films by slugs")
+		responseMessage, err := services.GetFilmsBySlug(payload.Pagination.Page, payload.Pagination.Limit, payload.Data.Slug)
+
 		if err != nil {
-			log.Printf("cannot respond back %v\n", err)
+			sendErrorBack(err, ch, delivery)
+			return
 		}
+
+		// Отправляем ответ в ту же очередь, откуда пришел запрос
+		sendMsgBack(responseMessage, ch, delivery)
 	default:
 		fmt.Printf("payload.Name %s\n", payload.Name)
 	}

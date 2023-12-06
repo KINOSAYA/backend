@@ -54,8 +54,9 @@ func (chiRouter *ChiRouters) GetRoutes() http.Handler {
 		mux.Post("/refresh", chiRouter.Handler.Refresh)
 	})
 
-	mux.Route("/collections", func(mux chi.Router) {
-		mux.Get("/new-films", chiRouter.Handler.GetCollections)
+	mux.Route("/kinopoisk", func(mux chi.Router) {
+		mux.Get("/slugs", chiRouter.Handler.GetSlugsByCollection)
+		mux.Get("/films", chiRouter.Handler.GetFilmsBySlug)
 	})
 
 	return mux

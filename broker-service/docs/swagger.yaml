@@ -8,7 +8,7 @@ definitions:
       message:
         type: string
     type: object
-  handlers.requestPayload:
+  handlers.registrationPayload:
     properties:
       email:
         type: string
@@ -53,10 +53,10 @@ paths:
       parameters:
       - description: User data
         in: body
-        name: requestPayload
+        name: registrationPayload
         required: true
         schema:
-          $ref: '#/definitions/handlers.requestPayload'
+          $ref: '#/definitions/handlers.registrationPayload'
       produces:
       - application/json
       responses:
@@ -79,7 +79,7 @@ paths:
       parameters:
       - description: User data
         in: body
-        name: requestPayload
+        name: registrationPayload
         required: true
         schema:
           $ref: '#/definitions/handlers.tempTokenReqPayload'
@@ -136,10 +136,10 @@ paths:
       parameters:
       - description: User data
         in: body
-        name: requestPayload
+        name: registrationPayload
         required: true
         schema:
-          $ref: '#/definitions/handlers.requestPayload'
+          $ref: '#/definitions/handlers.registrationPayload'
       produces:
       - application/json
       responses:
@@ -154,10 +154,41 @@ paths:
       summary: Register a new user
       tags:
       - Auth
-  /collections/new-films:
+  /kinopoisk/films:
+    get:
+      description: Retrieve films based on the provided slug.
+      parameters:
+      - description: The slug of the film
+        in: query
+        name: slug
+        required: true
+        type: string
+      - description: Page number for pagination
+        in: query
+        name: page
+        type: string
+      - description: Number of items per page
+        in: query
+        name: limit
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            type: string
+        "400":
+          description: Bad request
+          schema:
+            type: string
+      summary: Get Films by Slug
+      tags:
+      - Kinopoisk
+  /kinopoisk/slugs:
     get:
       description: This endpoint communicates with the Kinopoisk API to fetch JSON
-        data containing information about new films.
+        data containing information about slugs by chosen category.
       parameters:
       - description: Page of results
         in: query
@@ -180,5 +211,5 @@ paths:
             $ref: '#/definitions/handlers.jsonResponse'
       summary: Get Collection
       tags:
-      - Collections
+      - Kinopoisk
 swagger: "2.0"

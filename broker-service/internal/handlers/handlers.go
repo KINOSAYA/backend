@@ -23,7 +23,8 @@ type Handler interface {
 	ParseToken(w http.ResponseWriter, r *http.Request)
 	Refresh(w http.ResponseWriter, r *http.Request)
 
-	GetCollections(w http.ResponseWriter, r *http.Request)
+	GetSlugsByCollection(w http.ResponseWriter, r *http.Request)
+	GetFilmsBySlug(writer http.ResponseWriter, request *http.Request)
 }
 
 func NewBrokerHandler(authGrpcPort, authHost string, app config.Config) Handler {
@@ -61,7 +62,7 @@ func (app *brokerHandler) Broker(w http.ResponseWriter, r *http.Request) {
 	_ = helpers.WriteJSON(w, http.StatusOK, payload)
 }
 
-type requestPayload struct {
+type registrationPayload struct {
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -73,12 +74,12 @@ type requestPayload struct {
 // @Description Registers a new user with the specified data.
 // @Accept json
 // @Produce json
-// @Param requestPayload body requestPayload true "User data"
+// @Param registrationPayload body registrationPayload true "User data"
 // @Success 202 {object} jsonResponse "Successful registration"
 // @Failure 401 {object} jsonResponse "Invalid credentials"
 // @Router /auth/registration [post]
 func (app *brokerHandler) AuthUser(w http.ResponseWriter, r *http.Request) {
-	var requestPayload requestPayload
+	var requestPayload registrationPayload
 
 	err := helpers.ReadJSON(w, r, &requestPayload)
 	if err != nil {
@@ -129,12 +130,12 @@ func (app *brokerHandler) AuthUser(w http.ResponseWriter, r *http.Request) {
 // @Description Logs in a user with the given data.
 // @Accept json
 // @Produce json
-// @Param requestPayload body requestPayload true "User data"
+// @Param registrationPayload body registrationPayload true "User data"
 // @Success 202 {object} jsonResponse "Successful registration"
 // @Failure 401 {object} jsonResponse "Invalid credentials"
 // @Router /auth/login [post]
 func (app *brokerHandler) AuthLoginUser(w http.ResponseWriter, r *http.Request) {
-	var requestPayload requestPayload
+	var requestPayload registrationPayload
 
 	err := helpers.ReadJSON(w, r, &requestPayload)
 	if err != nil {
@@ -187,7 +188,7 @@ type tempTokenResponsePayload struct {
 // @Description token validation (token is alive for 24 hours
 // @Accept json
 // @Produce json
-// @Param requestPayload body tempTokenReqPayload true "User data"
+// @Param registrationPayload body tempTokenReqPayload true "User data"
 // @Success 202 {object} jsonResponse "Successful registration"
 // @Failure 401 {object} jsonResponse "Invalid credentials"
 // @Router /auth/parse-token [post]

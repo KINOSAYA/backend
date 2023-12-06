@@ -13,13 +13,17 @@ type Consumer struct {
 }
 
 type Payload struct {
-	Name string `json:"name"`
-	Data struct {
-		Page     int    `json:"page"`
-		Limit    int    `json:"limit"`
+	Name       string     `json:"name"`
+	Pagination Pagination `json:"pagination"`
+	Data       struct {
 		Category string `json:"category,omitempty"`
 		Slug     string `json:"slug,omitempty"`
 	} `json:"data,omitempty"`
+}
+
+type Pagination struct {
+	Page  int `json:"page"`
+	Limit int `json:"limit"`
 }
 
 func (cons Consumer) Listen(topics []string) error {
@@ -97,7 +101,7 @@ func sendErrorBack(err error, ch *amqp.Channel, delivery amqp.Delivery) {
 func handlePayload(payload Payload, ch *amqp.Channel, delivery amqp.Delivery) {
 	switch payload.Name {
 	case "get-slugs":
-		responseMessage, err := services.GetSlugsByCategory(payload.Data.Page, payload.Data.Limit, payload.Data.Category)
+		responseMessage, err := services.GetSlugsByCategory(payload.Pagination.Page, payload.Pagination.Limit, payload.Data.Category)
 
 		if err != nil {
 			sendErrorBack(err, ch, delivery)
@@ -109,7 +113,7 @@ func handlePayload(payload Payload, ch *amqp.Channel, delivery amqp.Delivery) {
 
 	case "get-films":
 		log.Println("got request for get-films by slugs")
-		responseMessage, err := services.GetFilmsBySlug(payload.Data.Page, payload.Data.Limit, payload.Data.Slug)
+		responseMessage, err := services.GetFilmsBySlug(payload.Pagination.Page, payload.Pagination.Limit, payload.Data.Slug)
 
 		if err != nil {
 			sendErrorBack(err, ch, delivery)

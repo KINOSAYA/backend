@@ -23,19 +23,16 @@ func (app *brokerHandler) GetSlugsByCollection(w http.ResponseWriter, r *http.Re
 	queryParams := r.URL.Query()
 	page, _ := strconv.Atoi(queryParams.Get("page"))
 	limit, _ := strconv.Atoi(queryParams.Get("limit"))
-	payload := struct {
-		Name string `json:"name"`
-		Data any
-	}{
+	payload := RequestForRabbitPayload{
 		Name: "get-slugs",
+		Pagination: Pagination{
+			Page:  page,
+			Limit: limit,
+		},
 		Data: struct {
-			Page     int    `json:"page"`
-			Limit    int    `json:"limit"`
 			Category string `json:"category"`
 		}{
-			Page:     page,
-			Limit:    limit,
-			Category: queryParams.Get("category"),
+			queryParams.Get("category"),
 		},
 	}
 
